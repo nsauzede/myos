@@ -1,4 +1,4 @@
-#include "kernel32.h"
+#include "libc.h"
 
 void setmode03( void)
 {
@@ -12,4 +12,3 @@ void setmode13( void)
 	_setmode13();
 	memset( (void *)0xa0000,0,320*200);
 }
-

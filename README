@@ -5,10 +5,17 @@ Copyright (C) Nicolas Sauzede 2009
 Written to learn operating systems implementation.
 
 Basically composed of x86 code, comprising a bootloader and a kernel.
+
 The main target is emulation via qemu, as a bios rom extension or a 
 bootable floppy disk image.
+But it should run as well on a real machine.
 
-See doc/specs.txt for more technical details.
+-the loader is a nasm x86 assembly code, managing 16/32 bit kernels.
+-the 16 bit kernel is pure nasm 16 bit code
+-the 32 bit kernel is plain ANSI C code, running in 32 bit protected mode,
+with one small gas assembly boot code.
+
+See doc/specs.txt for more technical details / general low level OS infos.
 
 Licensed as GPLv2. (see LICENSE)
 

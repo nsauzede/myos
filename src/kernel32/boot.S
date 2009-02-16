@@ -55,7 +55,13 @@ mov %eax,%ss
 mov $(stack + STACK_SIZE),%ebp
 mov %ebp,%esp
 #endif
+
+#if 0
+lidt idtr
+#endif
+
 call kernel_main
+
 mov $0xdeadbeef,%eax
 inf:
 	hlt
@@ -86,6 +92,56 @@ bssea: .long 0x00205CD0
 entry: .long 0x00201000
 #endif
 
+kb_handler:
+mov $1,%eax
+mov $0,%ebx
+div %ebx,%eax
+mov $0x20,%al
+out %al,$0x20
+iret
+
+idtr:
+.short idt_end-idt-1
+.long idt
+
+idt:
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+.long 0
+
+.long 0
+.long kb_handler
+idt_end:
+
 gdt:
 NULL_Desc:
 .word EndGDT-gdt-1
@@ -101,4 +157,8 @@ DS_Desc:
 EndGDT:
 nop;nop;nop
 kernel_end:
-//.comm stack,STACK_SIZE
+#if 0
+.comm stack,STACK_SIZE
+#else
+//stack: .long 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+#endif
