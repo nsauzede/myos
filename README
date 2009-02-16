@@ -1,0 +1,14 @@
+
+MyOS : a simple, self-teaching operating system.
+Copyright (C) Nicolas Sauzede 2009
+
+Written to learn operating systems implementation.
+
+Basically composed of x86 code, comprising a bootloader and a kernel.
+The main target is emulation via qemu, as a bios rom extension or a 
+bootable floppy disk image.
+
+See doc/specs.txt for more technical details.
+
+Licensed as GPLv2. (see LICENSE)
+
