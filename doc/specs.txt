@@ -1,0 +1,101 @@
+
+general specs :
+machine :
+min RAM : 512kiB
+min cpu : i8086 16 bit real mode
+
+loader:
+support multiboot (maybe)
+target:
+-bios rom				=> bios.bin
+start=0xf0000
+entry=0xffff0
+-rom extension			=> romext.bin
+entry=0xd0000+k*512
+=>first copied to 0x7c00
+-boot sector			=> fd.img
+entry=0x7c00
+
+loader pseudo-code
+{
+cli							; (useful here when single step)
+ds<-cs
+print greetings
+
+if ROM
+ si<-kernel_begin
+ es<-KERNEL_SEG
+ di<-0
+ cl<-KSIZE<<7				; [KERNEL+0]
+copy kernel to 0x7e00
+
+if ROM
+ es<-LOADER
+ copy self to 0x7c00
+
+jump 0x7c0:offset			; (mandatory to honour null offset)
+
+if PMODE switch to pmode	; [KERNEL+1]
+ jmp 8:KERNEL
+jump to kernel entry
+}
+
+kernel:
+multiboot compliant
+16 bit realm/32 bit pmode
+max size ?
+loaded at 0x7E00
+
+mem mapping :
+0000-03FF => int vectors
+0400-0600 => bios RAM
+
+bios:
+ranges between 0xC0000-0xFFFFF (256kiB)
+rom ext range between 0xC0000-0xEFFFF (180kiB)
+min bios 0xF0000-0xFFFFF (64kiB)
+
+vgabios:
+int13h:00:
+0x4BA seems to be cursor pos ?
+
+1MiB=0x100000=1048576
+736kiB=0xB8000
+720kiB=0xB4000
+640kiB=0xA0000
+512kiB=0x80000
+80000-7E00=0x78200=492032
+
+debug:
+b *0xffff0
+b *0xc0003
+b *0xd0003
+b *0x7c00
+
+boot POST:
+cs:ip=F000:FFF0 ax=0000
+ss:sp=0000:0000 cx=0000
+ds:si=0000:0000 dx=0633 bp=0000
+es:di=0000:0000 bx=0000 fl=0002
+
+vga bios
+cs:ip=C000:0003 ax=F000
+ss:sp=0000:FFEE cx=C000
+ds:si=0000:0000 dx=007C bp=FFF2
+es:di=F000:B6D1 bx=0000 fl=0046
+
+option rom
+cs:ip=D000:0003 ax=F000
+ss:sp=0000:FFF0 cx=D000
+ds:si=0000:00CB dx=0700 bp=FFF4
+es:di=F000:AF51 bx=0000 fl=0046
+
+boot sector:
+cs:ip=0000:7C00 ax=AA55
+ss:sp=0000:FFDC cx=0000
+ds:si=0000:0000 dx=0000 bp=0000
+es:di=0000:FDBA bx=0000 fl=0082
+
+sum: (rom maker)
+expect a file beginning with bytes 55, AA, fake_size.
+will compute/patch rounded padded size, and add trailing checksum
