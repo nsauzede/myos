@@ -1,11 +1,17 @@
-%define LOADER_ADDR 0x7C00
+%define LOADER_ADDR 0x7C00			; this is where we will be running at
 %define LOADER_OFS LOADER_ADDR
 %define LOADER_SEG (LOADER_ADDR>>4)
 
-%define KERNEL_ADDR 0x7E00
+%define KERNEL_ADDR 0x7E00			; this is where the kernel must be loaded (and run)
 %define KERNEL_OFS KERNEL_ADDR
 %define KERNEL_SEG (KERNEL_ADDR>>4)
-%define KERNEL_ENTRY 6
+%define KERNEL_ENTRY 6				; this is the offset of the kernel entry point, after header
+
+; if SECTOR is defined, then we are a floppy (or hard ?) disk boot sector loader, kernel follows
+; if ROM is defined, then we are a BIOS ROM extension loader, kernel follows
+
+; in either cases, this loader will be mostly executed at 0x7C00, to simplify protected mode switch
+; (in case of ROM, we first copy ourself to 0x7C00, to simulate SECTOR conditions)
 
 ; mandatory, to get proper offsets, whatever segment we get initially loaded to
 org 0
@@ -65,6 +71,7 @@ mov al,[kernel_begin+1]
 cmp al,1
 jne nprotect				; shall we switch to protected mode now ? (if 32 bit kernel)
 
+; we are about to switch to 32 bit protected mode
 call is32bit0
 is32bit db "kernel is 32 bit",13,10,0
 is32bit0:
@@ -141,7 +148,7 @@ cmp al,0
 jnz print0
 ret
 
-copy:
+copy:					; copy the kernel to its load address before running it
 %ifdef SECTOR
 mov ax,0x0202
 mov cx,0x0001
@@ -181,7 +188,7 @@ ret
 
 %ifdef SECTOR
 ; al=ndots
-dots:
+dots:					; this is a simple routine to print N-dots as loading progress
 push ax
 push bx
 push cx

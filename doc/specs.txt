@@ -99,3 +99,11 @@ es:di=0000:FDBA bx=0000 fl=0082
 sum: (rom maker)
 expect a file beginning with bytes 55, AA, fake_size.
 will compute/patch rounded padded size, and add trailing checksum
+
+idt:
+WARNING : before sti+hlt, we must define a valid double fault exception handler !
+else we keep on getting triple fault !
+
+gdt:
+WARNING : it seems we must first ljmp to zeroize offset before lgdt;
+also be careful to set proper ds before lgdt

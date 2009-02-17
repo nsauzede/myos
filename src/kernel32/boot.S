@@ -56,10 +56,6 @@ mov $(stack + STACK_SIZE),%ebp
 mov %ebp,%esp
 #endif
 
-#if 0
-lidt idtr
-#endif
-
 call kernel_main
 
 mov $0xdeadbeef,%eax
@@ -80,67 +76,7 @@ ldadr: .long KERNEL_ADDR
 ldead: .long KERNEL_ADDR+_end
 bssea: .long 0x0
 entry: .long _kernel_entry
-#else
-/* multiboot header */
-magic: .long 0x1badb002
-flags: .long 0x00010003
-chksm: .long 0xE4514FFB
-hdrad: .long 0x00200000
-ldadr: .long 0x00201000
-ldead: .long 0x00201CC3
-bssea: .long 0x00205CD0
-entry: .long 0x00201000
 #endif
-
-kb_handler:
-mov $1,%eax
-mov $0,%ebx
-div %ebx,%eax
-mov $0x20,%al
-out %al,$0x20
-iret
-
-idtr:
-.short idt_end-idt-1
-.long idt
-
-idt:
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-.long 0
-
-.long 0
-.long kb_handler
-idt_end:
 
 gdt:
 NULL_Desc:
@@ -157,8 +93,3 @@ DS_Desc:
 EndGDT:
 nop;nop;nop
 kernel_end:
-#if 0
-.comm stack,STACK_SIZE
-#else
-//stack: .long 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-#endif
