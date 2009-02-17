@@ -19,7 +19,6 @@ static void divideerror( int id)
 #endif
 }
 
-#if 1
 static void kbhandler( int foo)
 {
 	static int count = 0;
@@ -31,7 +30,6 @@ static void kbhandler( int foo)
 	}
 #endif
 }
-#endif
 
 void kernel_main()
 {
@@ -47,12 +45,12 @@ void kernel_main()
 	
 	asm volatile( "sti");
 	
-#if 0
+#if 1
 	int i = 5;
 	while (1)
 	{
 		asm volatile( "mov $1,%%eax;div %0,%%eax"::"g"(i));
-		i--;
+		if (i)i--;
 	}
 #endif
 	

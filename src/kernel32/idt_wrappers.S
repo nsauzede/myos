@@ -64,7 +64,7 @@ mov $0x20,%al
 outb %al,$0x20
 push $\id
 lea idt_handlers,%edi
-call *\id*4(%edi)
+call *(IRQ_BASE+\id)*4(%edi)
 add $4,%esp
 pop %gs
 pop %fs
@@ -107,6 +107,6 @@ idt_wrappers:
 .long 0
 .endr
 
-.irp id,32,33
+.irp id,0,1
 .long irq_wrapper_\id
 .endr

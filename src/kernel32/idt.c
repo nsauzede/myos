@@ -128,6 +128,11 @@ void i8259_setup()
 	outb( 0xFF, SLAVE+1);
 }
 
+void i8259_enable_line( int num)
+{
+	outb( inb(MASTER+1) & ~(1 << num),MASTER+1);
+}
+
 void irq_setup()
 {
 	i8259_setup();
@@ -136,8 +141,9 @@ void irq_setup()
 void irq_set_handler( int num, void *handler)
 {
 	asm volatile( "cli");
-	idt_handlers[num] = handler;
-	idt_set_handler( num, idt_wrappers[num]);
+	idt_handlers[IRQ_BASE + num] = handler;
+	idt_set_handler( IRQ_BASE + num, idt_wrappers[num]);
+	i8259_enable_line( num);
 	asm volatile( "sti");
 }
 
