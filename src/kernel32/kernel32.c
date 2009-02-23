@@ -1,6 +1,7 @@
 #include "libc.h"
 #include "vid.h"
 
+#include "ioport.h"
 #include "idt.h"
 
 unsigned char stack[0x4000] = {
@@ -41,8 +42,10 @@ void timer_handler( int id, uint32_t ebp)
 	jiffies++;
 }
 
-void kbhandler( int id, uint32_t ebp)
+#define KB_PORT 0x60
+void kb_handler( int id, uint32_t ebp)
 {
+	inb( KB_PORT);
 	kbhits++;
 }
 
@@ -64,7 +67,7 @@ void kernel_main()
 	exception_set_handler( EXCEPTION_DIVIDE, (idt_handler_t)int_handler);
 
 	irq_setup();
-	irq_set_handler( IRQ_KB, kbhandler);
+	irq_set_handler( IRQ_KB, kb_handler);
 	irq_set_handler( IRQ_TIMER, timer_handler);
 	i8254_set_freq( 1);
 
