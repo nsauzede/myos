@@ -2,12 +2,7 @@
 
 #include "libc.h"
 
-#define MAX_ROW 25
-#define MAX_COL 80
-#define DEFAULT_ATTR	0x7
-static int col = 0;
-static int row = 0;
-static unsigned char attr = 0;
+#include "vid.h"
 
 void *mmemset( void *_s, int c, size_t n)
 {
@@ -24,95 +19,9 @@ void *mmemset( void *_s, int c, size_t n)
 	return _s;
 }
 
-void console_init()
+static char *hextostr( char *_s, void *ptr, int _len)
 {
-	col = 0;
-	row = 0;
-	attr = DEFAULT_ATTR;
-#if 0
-	void setmode03();
-	setmode03();
-#elif 0
-	void setmode13();
-	setmode13();
-	unsigned char *screen = (void *)0xA0000;
-	screen[320 * 0 + 0] = 0x0;
-	screen[320 * 0 + 1] = 0x5;
-	screen[320 * 0 + 2] = 0x0;
-	screen[320 * 1 + 0] = 0x5;
-	screen[320 * 1 + 1] = 0x0;
-	screen[320 * 1 + 2] = 0x5;
-	screen[320 * 2 + 0] = 0x0;
-	screen[320 * 2 + 1] = 0x5;
-	screen[320 * 2 + 2] = 0x0;
-#endif
-}
-
-void cls()
-{
-	col = 0;
-	row = 0;
-	attr = DEFAULT_ATTR;
-	memset( (void *)0xb8000, 0, MAX_ROW * MAX_COL * 2);
-}
-
-static int dputchar( int c)
-{
-	unsigned char *ptr = (void *)0xB8000;
-
-		int skip = 0;
-
-		if (c == '\n')
-		{
-			if (row < MAX_ROW)
-			{
-				col = 0;
-				row++;
-			}
-			skip = 1;
-		}
-		if (!skip)
-		{
-			ptr[(row * 80 + col) * 2] = c;
-			ptr[(row * 80 + col) * 2 + 1] = attr;
-			if (col < MAX_COL)
-				col++;
-		}
-
-	return 0;
-}
-
-void dputs( const char *s)
-{
-	unsigned char *ptr = (void *)0xB8000;
-
-	if (s)
-	while (*s)
-	{
-		int skip = 0;
-
-		if (*s == '\n')
-		{
-			if (row < MAX_ROW)
-			{
-				col = 0;
-				row++;
-			}
-			skip = 1;
-		}
-		if (!skip)
-		{
-			ptr[(row * 80 + col) * 2] = *s;
-			ptr[(row * 80 + col) * 2 + 1] = attr;
-			if (col < MAX_COL)
-				col++;
-		}
-		s++;
-	}
-}
-
-static char *hextostr( char *_s, void *ptr, int len)
-{
+	int len = _len;
 	char *s = _s + len * 2;
 	if (s && ptr)
 	{
@@ -127,6 +36,27 @@ static char *hextostr( char *_s, void *ptr, int len)
 			digit = (c >> 4) & 0xf;
 			*s-- = digit >= 10 ? digit + 'A' - 10 : digit + '0';
 			len--;
+		}
+		
+		s = _s;
+		int skip = 0;
+		while (*s)
+		{
+			if (*s != '0')
+				break;
+			skip++;
+			s++;
+		}
+		s = _s;
+		if (skip == (_len * 2))
+			skip--;
+		if (skip)
+		while (1)
+		{
+			*s = *(s + skip);
+			if (!*s)
+				break;
+			s++;
 		}
 	}
 	
@@ -150,11 +80,19 @@ int mprintf( const char *fmt, ...)
 			switch (*fmt)
 			{
 				case 'p':
+				case 'x':
 					ptr = va_arg( ap, typeof( ptr));
-					dputs( "0x");
+//					dputs( "0x");
 					hextostr( buf, &ptr, sizeof( ptr));
 					dputs( buf);
 					break;
+#if 0
+				case 'd':
+					ptr = va_arg( ap, typeof( ptr));
+					dectostr( buf, &ptr, sizeof( ptr));
+					dputs( buf);
+					break;
+#endif
 			}
 		}
 		else

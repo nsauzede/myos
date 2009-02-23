@@ -216,3 +216,11 @@ db 0x55,0xAA
 %endif
 
 kernel_begin:
+
+%assign usedlen (end - start)
+%assign freelen (512 - usedlen - 2)
+%error ========= LOADER STATISTICS ==============================
+%error ========= used size=usedlen
+%ifdef SECTOR
+%error ========= space left=freelen
+%endif

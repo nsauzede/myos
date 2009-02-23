@@ -1,7 +1,7 @@
 TARGET=fd.img fd32.img romext.rom romext32.rom
 
 QEMU=qemu
-QEMU+=-m 2
+QEMU+=-m 3
 QEMU+=-cpu 486 -std-vga
 ifdef T
 QEMU+=-S -s

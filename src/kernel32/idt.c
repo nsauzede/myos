@@ -1,7 +1,9 @@
 #include "libc.h"
 #include "types.h"
 
+#include "ioport.h"
 #include "idt.h"
+#include "vid.h"
 
 #pragma pack(1)
 typedef struct idtr {
@@ -30,9 +32,25 @@ typedef struct idte {
 static idte_t idt[IDT_NUM];
 
 extern void *idt_wrappers[IDT_NUM];
+extern void *def_int_wrappers[IDT_NUM];
 
-typedef void (*idt_handler_t)( int);
 idt_handler_t idt_handlers[IDT_NUM];
+
+void hlt()
+{
+	asm volatile( "hlt");
+}
+
+// FIXME : implement flags backup
+void disable()
+{
+	asm volatile( "cli");	
+}
+
+void enable()
+{
+//	asm volatile( "sti");
+}
 
 void idt_setup()
 {
@@ -46,6 +64,7 @@ void idt_setup()
 		idte->seg_sel = 0x8;
 		idte->type = 0x6;
 		idte->op_size = 1;
+		idt_set_handler( i, def_int_wrappers[i]);
 	}
 	
 	idtr.base_addr = (typeof(idtr.base_addr))idt;
@@ -55,11 +74,10 @@ void idt_setup()
 		"lidt %0\n\r"
 		:
 		: "m"(idtr)
-		: "memory"
 	);
 }
 
-void idt_set_handler( int num, void *handler)
+void idt_set_handler( int num, idt_handler_t handler)
 {
 	idte_t *idte = &idt[num];
 	if (!handler)
@@ -83,30 +101,13 @@ void exception_setup()
 	idt_set_handler( EXCEPTION_DOUBLE, idt_wrappers[EXCEPTION_DOUBLE]);
 }
 
-void exception_set_handler( int num, void *handler)
+void exception_set_handler( int num, idt_handler_t handler)
 {
-	asm volatile( "cli");
+	disable();
 	idt_handlers[num] = handler;
 	idt_set_handler( num, idt_wrappers[num]);
-	asm volatile( "sti");
+	enable();
 }
-
-#define outb(value, port) \
-	__asm__ volatile (                                            \
-	"outb %b0,%w1"                                          \
-	::"a" (value),"Nd" (port)                               \
-	)
-
-#define inb(port)                                               \
-	({                                                              \
-	unsigned char _v;                                             \
-	__asm__ volatile (                                            \
-	"inb %w1,%0"                                            \
-	:"=a" (_v)                                              \
-	:"Nd" (port)                                            \
-	);                                                      \
-	_v;                                                           \
-	})
 
 #define MASTER 0x20
 #define SLAVE 0xa0
@@ -133,17 +134,37 @@ void i8259_enable_line( int num)
 	outb( inb(MASTER+1) & ~(1 << num),MASTER+1);
 }
 
+void i8259_disable_line( int num)
+{
+	outb( inb(MASTER+1) | (1 << num),MASTER+1);
+}
+
 void irq_setup()
 {
 	i8259_setup();
+	
+	i8259_disable_line( 0);
+	i8259_disable_line( 1);
 }
 
-void irq_set_handler( int num, void *handler)
+void irq_set_handler( int num, idt_handler_t handler)
 {
-	asm volatile( "cli");
+	disable();
+#if 1
 	idt_handlers[IRQ_BASE + num] = handler;
-	idt_set_handler( IRQ_BASE + num, idt_wrappers[num]);
+	idt_set_handler( IRQ_BASE + num, idt_wrappers[IRQ_BASE + num]);
+#endif
 	i8259_enable_line( num);
-	asm volatile( "sti");
+	enable();
 }
 
+#define MAX_FREQ 1193180
+#define TIMER0 0x40
+#define CONTROL 0x43
+void i8254_set_freq( unsigned int freq)
+{
+	unsigned int nb_tick = MAX_FREQ / freq;
+	outb( 0x34, CONTROL);
+	outb( nb_tick & 0xFF, TIMER0);
+	outb( (nb_tick >> 8) & 0xFF, TIMER0);
+}
