@@ -43,9 +43,15 @@ void timer_handler( int id, uint32_t ebp)
 }
 
 #define KB_PORT 0x60
+#define KB_SIZE 20
+static unsigned char kb_ring[KB_SIZE];
+int kb_head = 0;
 void kb_handler( int id, uint32_t ebp)
 {
-	inb( KB_PORT);
+	unsigned char byte;
+	byte = inb( KB_PORT);
+	kb_ring[kb_head % KB_SIZE] = byte;
+	kb_head = (kb_head + 1) % KB_SIZE;
 	kbhits++;
 }
 
@@ -80,13 +86,22 @@ void kernel_main()
 		static int count = 0;
 		static int div = 0;
 		
-		printf( "\rlooping.. #%p jif=%p kb=%p divs=%p div=%x", (void *)count++, jiffies, kbhits, divs, div);
+		gotoxy( 0, 3);
+		printf( "\rlooping.. #%08lx jif=%08lx kb=%p divs=%p div=%x", (void *)count++, jiffies, kbhits, divs, div);
 //		asm volatile( "int $0");
 #if 0
 		asm volatile( "mov $0x12345678,%%ecx;mov $0xdeadbeef,%%ebx;mov $0xcafedeca,%%eax;idivl %0"::"g"(i):"eax");
 		div = 1 / i;
 #endif
 		if (i)i--;
+
+		gotoxy( 0, 4);
+		int j;
+		for (j = 0; j < KB_SIZE; j++)
+		{
+			printf( "%02x%c", kb_ring[j], j == kb_head ? '<' : ' ');
+		}
+		asm volatile( "hlt");
 	}
 	
 	printf( "*system32 halted*");
