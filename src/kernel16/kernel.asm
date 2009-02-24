@@ -1,7 +1,7 @@
 %define KERNEL_LOAD_ADDR 0x7E00
 %define KERNEL_SSIZE ((kernel_end-kernel_start) / 512)
 %define LOAD_SEG 0
-%define LOAD_OFS 0
+%define LOAD_OFS KERNEL_LOAD_ADDR
 
 BITS 16
 CPU 8086
@@ -17,6 +17,8 @@ dw LOAD_OFS
 kernel_main:
 jmp _kernel_entry
 
+sgreet db "hello kernel16 - kernel_main=[%p]",13,10,0
+
 ; multiboot header
 magic dd 0x1badb002
 flags dd 0x0
@@ -27,7 +29,6 @@ ldead dd KERNEL_LOAD_ADDR+kernel_end
 bssea dd 0x0
 entry dd _kernel_entry
 
-sgreet db 13,10,13,10,"hello kernel16 - kernel_main=[%p]",13,10,0
 sloop db "looping.. #%x jif=%x kb=%x divs=%x div=%x",13,10,0
 shalted db "*system16 halted*",0
 sgreet2 db "DIRECT SCREEN OUTPUT",13,10,0
@@ -43,6 +44,11 @@ push cs
 pop ds
 
 call console_init
+
+mov si,0x0200
+push si
+call gotoxy
+pop si
 
 mov si,kernel_main
 push si
