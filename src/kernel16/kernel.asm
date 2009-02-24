@@ -3,6 +3,10 @@
 %define LOAD_SEG 0
 %define LOAD_OFS 0
 
+BITS 16
+CPU 8086
+ORG KERNEL_LOAD_ADDR
+
 kernel_start:
 
 db KERNEL_SSIZE
@@ -23,54 +27,33 @@ ldead dd KERNEL_LOAD_ADDR+kernel_end
 bssea dd 0x0
 entry dd _kernel_entry
 
+greet db "hello kernel16",13,10,0
+shalted db "*system16 halted*",0
+greet2 db "DIRECT SCREEN OUTPUT",0
+
 _kernel_entry:
 push cs
 pop ds
-call here
-here:
-pop word [orig]
-mov si,[orig]
-add si,greet-here
+
+;call console_init
+
+mov si,greet
 call print
 
 ; display some text
-mov di,0xB800
-mov es,di
-xor di,di
-mov si,[orig]
-add si,greet2-here
-.loop:
-lodsb
-or al,al
-jz .end
-stosb
-inc di
-jmp .loop
-.end:
+mov si,greet2
+call printnb
 
 ; halt system
-mov si,[orig]
-add si,shalted-here
+mov si,shalted
 call print
 inf:
 hlt
 jmp inf
 ret
 
-orig dw 0
-greet db "hello kernel16",13,10,0
-shalted db "*system16 halted*",0
-greet2 db "DIRECT SCREEN OUTPUT",0
-
-print0:
-mov bx,1
-mov ah,0x0E
-int 10h
-print:
-lodsb
-cmp al,0
-jnz print0
-ret
+%include "vid.asm"
+%include "vidnb.asm"
 
 ; to test multisector load
 ;times 1024 db 0xca
