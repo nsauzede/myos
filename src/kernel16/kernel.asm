@@ -56,7 +56,7 @@ mov si,sgreet
 call printf
 
 sti
-loop:
+loop0:
 
 inc word [loops]
 
@@ -79,7 +79,7 @@ call printf
 
 hlt
 
-jmp loop
+jmp loop0
 
 call home
 ; halt system
