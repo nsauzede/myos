@@ -35,23 +35,15 @@ _kernel_entry:
 push cs
 pop ds
 
-;call console_init
-
-call cls
-%if 0
-mov ax,0x0000
-push ax
-call gotoxy
-pop ax
-%else
-%endif
+call console_init
 
 mov si,greet
 call print
 
+call home
 ; display some text
 mov si,greet2
-call printnb
+call print
 
 ; halt system
 mov si,shalted
@@ -62,7 +54,7 @@ jmp inf
 ret
 
 %include "vid.asm"
-%include "vidnb.asm"
+;%include "vidnb.asm"
 
 ; to test multisector load
 ;times 1024 db 0xca

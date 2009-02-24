@@ -11,7 +11,7 @@ CPU 8086
 %define DEFAULT_ATTR (BG(BLACK) | FG(GREEN))
 
 console_init:
-;call cls
+call cls
 call home
 ret
 
@@ -49,6 +49,7 @@ xor ax,ax
 push ax
 call gotoxy
 pop ax
+pop ax
 ret
 
 cls:
@@ -66,4 +67,7 @@ pop cx
 pop di
 pop es
 pop ax
+ret
+
+printf:
 ret
