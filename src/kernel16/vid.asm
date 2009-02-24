@@ -16,14 +16,33 @@ call home
 ret
 
 ; ds:si=strz
-print0:
+print:
+push si
+push bx
+push ax
+mov bx,1
+mov ah,0x0E
+.loop:
+lodsb
+or al,al
+jz .end
+int 10h
+jmp .loop
+.end:
+pop ax
+pop bx
+pop si
+ret
+
+; al=char
+print1:
+push bx
+push ax
 mov bx,1
 mov ah,0x0E
 int 10h
-print:
-lodsb
-cmp al,0
-jnz print0
+pop ax
+pop bx
 ret
 
 ; row_col
@@ -67,7 +86,4 @@ pop cx
 pop di
 pop es
 pop ax
-ret
-
-printf:
 ret
