@@ -27,15 +27,24 @@ ldead dd KERNEL_LOAD_ADDR+kernel_end
 bssea dd 0x0
 entry dd _kernel_entry
 
-greet db "hello kernel16",13,10,0
+greet db 13,10,13,10,"hello kernel16",13,10,0
 shalted db "*system16 halted*",0
-greet2 db "DIRECT SCREEN OUTPUT",0
+greet2 db "DIRECT SCREEN OUTPUT",13,10,0
 
 _kernel_entry:
 push cs
 pop ds
 
 ;call console_init
+
+call cls
+%if 0
+mov ax,0x0000
+push ax
+call gotoxy
+pop ax
+%else
+%endif
 
 mov si,greet
 call print

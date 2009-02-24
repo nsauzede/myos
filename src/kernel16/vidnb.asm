@@ -54,7 +54,7 @@ pop bp
 ret
 
 %if 1
-console_init:
+console_initnb:
 %if 0
 push ax
 mov al,DEFAULT_ATTR
@@ -74,12 +74,12 @@ ret
 col dw 0
 row dw 0
 ; ax=col bx=row
-gotoxy:
+gotoxynb:
 mov [col],ax
 mov [row],bx
 ret
 
-home:
+homenb:
 push ax
 push bx
 xor ax,ax
@@ -89,7 +89,7 @@ pop bx
 pop ax
 ret
 
-cls:
+clsnb:
 mov ax,MAX_ROW*MAX_COL*2
 push ax
 xor ax,ax
