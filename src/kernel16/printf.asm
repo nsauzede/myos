@@ -22,6 +22,8 @@ cmp al,'p'
 je .fmtp
 cmp al,'x'
 je .fmtp
+cmp al,'c'
+je .fmtc
 jmp .endfmtloop
 
 .fmtp:
@@ -29,6 +31,11 @@ mov ax,[bp]
 call printw
 add bp,2
 jmp .loop
+
+.fmtc:
+mov ax,[bp]
+add bp,2
+jmp .endfmtloop
 
 .endfmtloop:
 .print1:

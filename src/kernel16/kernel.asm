@@ -29,33 +29,96 @@ ldead dd KERNEL_LOAD_ADDR+kernel_end
 bssea dd 0x0
 entry dd _kernel_entry
 
-sloop db "looping.. #%x jif=%x kb=%x divs=%x div=%x",13,10,0
 shalted db "*system16 halted*",0
 sgreet2 db "DIRECT SCREEN OUTPUT",13,10,0
 
 loops dw 0
 jiffies dw 0
-kbs dw 0
+kbs dw 6
 divs dw 0
 divi dw 0
 
+%define KB_SIZE 20
+%define KB_PORT 0x60
+kb_ring times KB_SIZE db 0
+kb_head dw KB_SIZE-1
+kb_handler:
+push ax
+push si
+mov al,0x20
+out 0x20,al
+in al,KB_PORT
+%if 0
+mov si,word [kb_head]
+inc si
+cmp si,KB_SIZE
+jb .skip
+xor si,si
+.skip:
+mov word [kb_head],si
+add si,kb_ring
+stosb
+%endif
+inc word [kbs]
+pop si
+pop ax
+iret
+
+timer_handler:
+push ax
+mov al,0x20
+out 0x20,al
+inc word [jiffies]
+pop ax
+iret
+
+; kernel entry
+;------------------------------------------------------------
 _kernel_entry:
 push cs
 pop ds
+
+%if 1
+cli
+push ds
+xor si,si
+mov ds,si
+mov word [0x8*4+2],cs
+mov word [0x8*4+0],timer_handler
+pop ds
+in al,0x21
+and al,~(1 << 8)
+out 0x21,al
+%endif
+
+%if 1
+cli
+push ds
+xor si,si
+mov ds,si
+mov word [0x9*4+2],cs
+mov word [0x9*4+0],kb_handler
+pop ds
+in al,0x21
+and al,~(1 << 1)
+out 0x21,al
+%endif
+
+sti
 
 call console_init
 
 mov si,0x0200
 push si
 call gotoxy
-pop si
+add sp,2
 
 mov si,kernel_main
 push si
 mov si,sgreet
 call printf
+add sp,2
 
-sti
 loop0:
 
 inc word [loops]
@@ -63,7 +126,8 @@ inc word [loops]
 mov si,0x0300
 push si
 call gotoxy
-pop si
+add sp,2
+
 mov si,[divi]
 push si
 mov si,[divs]
@@ -76,6 +140,24 @@ mov si,[loops]
 push si
 mov si,sloop
 call printf
+add sp,10
+
+mov cx,KB_SIZE
+mov si,kb_ring
+.loop:
+mov al,' '
+cmp cx,kb_head
+jne .skip
+mov al,'<'
+.skip:
+push ax
+lodsb
+push ax
+mov si,skb
+call printf
+add sp,4
+dec cx
+jnz .loop
 
 hlt
 
@@ -89,6 +171,9 @@ inf:
 hlt
 jmp inf
 ret
+
+sloop db "looping.. #%x jif=%x kb=%x divs=%x div=%x",13,10,0
+skb db "%x:%c ",0
 
 %if 1
 %include "vid.asm"

@@ -67,7 +67,7 @@ push ax
 xor ax,ax
 push ax
 call gotoxy
-pop ax
+add sp,2
 pop ax
 ret
 

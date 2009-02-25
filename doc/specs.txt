@@ -1,7 +1,7 @@
 
 general specs :
 machine :
-min RAM : 512kiB
+min RAM : 512kiB (in fact, 3MB in QEMU - bios, vga ?)
 min cpu : i8086 16 bit real mode
 
 loader:
