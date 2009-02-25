@@ -38,27 +38,37 @@ divi dw 0
 %define KB_SIZE 20
 %define KB_PORT 0x60
 kb_ring times KB_SIZE db 0
-kb_head dw KB_SIZE-1
+kb_head dw 0
 kb_handler:
+push ds
+push es
 push ax
-push si
+push di
+push cs
+pop es
+push cs
+pop ds
 mov al,0x20
 out 0x20,al
 in al,KB_PORT
-%if 0
-mov si,word [kb_head]
-inc si
-cmp si,KB_SIZE
-jb .skip
-xor si,si
-.skip:
-mov word [kb_head],si
-add si,kb_ring
+%if 1
+mov di,word [kb_head]
+add di,kb_ring
 stosb
+sub di,kb_ring
+
+cmp di,KB_SIZE
+jb .skip
+xor di,di
+.skip:
+mov word [kb_head],di
+
 %endif
 inc word [kbs]
-pop si
+pop di
 pop ax
+pop es
+pop ds
 iret
 
 timer_handler:
@@ -212,25 +222,29 @@ mov si,sloop
 call printf
 add sp,10
 
-mov cx,KB_SIZE
+xor cx,cx
 mov si,kb_ring
 .loop:
 mov al,' '
-cmp cx,kb_head
+cmp cx,[kb_head]
 jne .skip
 mov al,'<'
 .skip:
 push ax
 lodsb
+mov di,si
 push ax
 mov si,skb
 call printf
 add sp,4
-dec cx
-jnz .loop
+mov si,di
+inc cx
+cmp cx,KB_SIZE
+jb .loop
 
 hlt
 
+%if 0
 mov bx,0xbbbb
 mov cx,0xcccc
 mov dx,0xdddd
@@ -243,12 +257,13 @@ mov ax,0xd5d5
 mov ds,ax
 mov ax,0xaaaa
 int 1
+%endif
 
 jmp loop0
 ;----------------------------------------------------------------------
 
 sloop db "looping.. #%x jif=%x kb=%x divs=%x div=%x",13,10,0
-skb db "%x:%c ",0
+skb db "%02x%c",0
 
 %if 1
 %include "vid.asm"
