@@ -29,12 +29,9 @@ ldead dd KERNEL_LOAD_ADDR+kernel_end
 bssea dd 0x0
 entry dd _kernel_entry
 
-shalted db "*system16 halted*",0
-sgreet2 db "DIRECT SCREEN OUTPUT",13,10,0
-
 loops dw 0
 jiffies dw 0
-kbs dw 6
+kbs dw 0
 divs dw 0
 divi dw 0
 
@@ -72,37 +69,110 @@ inc word [jiffies]
 pop ax
 iret
 
+def_handler0 db "int#%x: "
+db "code=%x "
+db "ip=%x cs=%x flags=%x "
+db "es=%x ds=%x ss=%x "
+db 13,10
+db "ax=%x bx=%x cx=%x dx=%x si=%x di=%x "
+db "bp=%x sp=%x "
+db 0
+def_handler:
+				; 30 (flags)
+				; 28 (cs)
+				; 26 (ip)
+				; 24 (ax)
+push sp			; 22
+push bp			; 20
+push di			; 18
+push si			; 16
+push dx			; 14
+push cx			; 12
+push bx			; 10
+push es			; 8
+push ds			; 6
+push ss			; 4
+push ax			; 2 (int number)
+mov ax,0xc0de
+push ax			; 0 (int code)
+
+mov bp,sp
+mov ax,word [bp+22]
+add ax,8		; compensate 4 words (flags, cs, ip, ax)
+push ax
+push word [bp+20]
+push word [bp+18]
+push word [bp+16]
+push word [bp+14]
+push word [bp+12]
+push word [bp+10]
+push word [bp+24]
+push word [bp+4]
+push word [bp+6]
+push word [bp+8]
+push word [bp+30]
+push word [bp+28]
+push word [bp+26]
+push word [bp+0]
+push word [bp+2]
+
+push cs
+pop ds
+mov di,0xB800
+mov es,di
+xor di,di
+mov ax,0x0C00
+mov cx,80*2
+rep stosw
+call home
+
+mov si,def_handler0
+call printf
+
+.inf:
+hlt
+jmp .inf
+
+def_handler_0:
+push ax
+mov ax,0
+jmp def_handler
+
+def_handler_1:
+push ax
+mov ax,1
+jmp def_handler
+
 ; kernel entry
 ;------------------------------------------------------------
 _kernel_entry:
 push cs
 pop ds
 
-%if 1
 cli
 push ds
 xor si,si
 mov ds,si
-mov word [0x8*4+2],cs
-mov word [0x8*4+0],timer_handler
-pop ds
-in al,0x21
-and al,~(1 << 8)
-out 0x21,al
-%endif
 
-%if 1
-cli
-push ds
-xor si,si
-mov ds,si
-mov word [0x9*4+2],cs
-mov word [0x9*4+0],kb_handler
-pop ds
 in al,0x21
+
+mov word [0x00*4+2],cs
+mov word [0x00*4+0],def_handler_0
+
+mov word [0x01*4+2],cs
+mov word [0x01*4+0],def_handler_1
+
+mov word [0x08*4+2],cs
+mov word [0x08*4+0],timer_handler
+and al,~(1 << 0)
+
+mov word [0x09*4+2],cs
+mov word [0x09*4+0],kb_handler
 and al,~(1 << 1)
+
 out 0x21,al
-%endif
+
+pop ds
 
 sti
 
@@ -161,16 +231,21 @@ jnz .loop
 
 hlt
 
-jmp loop0
+mov bx,0xbbbb
+mov cx,0xcccc
+mov dx,0xdddd
+mov bp,0xb0b0
+mov si,0x5151
+mov di,0xd1d1
+mov ax,0xe5e5
+mov es,ax
+mov ax,0xd5d5
+mov ds,ax
+mov ax,0xaaaa
+int 1
 
-call home
-; halt system
-mov si,shalted
-call print
-inf:
-hlt
-jmp inf
-ret
+jmp loop0
+;----------------------------------------------------------------------
 
 sloop db "looping.. #%x jif=%x kb=%x divs=%x div=%x",13,10,0
 skb db "%x:%c ",0

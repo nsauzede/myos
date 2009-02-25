@@ -47,7 +47,7 @@ max size ?
 loaded at 0x7E00
 
 mem mapping :
-0000-03FF => int vectors
+0000-03FF => int vectors (+bios param tables)
 0400-0600 => bios RAM
 
 bios:
