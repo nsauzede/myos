@@ -80,9 +80,12 @@ int main( int argc, char *argv[])
 				int padsize = sizecomp * 512 - size - 2;
 				if (padsize > 0)
 				{
+					char *buf2 = malloc( padsize);
+
 					printf( "padding %d bytes\n", padsize);
-					memset( buf, 0x00, padsize);
-					fwrite( buf, padsize, 1, out);
+					memset( buf2, 0x00, padsize);
+					fwrite( buf2, padsize, 1, out);
+					free( buf2);
 				}
 				w = pad;
 				fwrite( &w, sizeof( w), 1, out);

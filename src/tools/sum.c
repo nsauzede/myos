@@ -20,15 +20,14 @@ int main( int argc, char *argv[])
 	in = fopen( name, "rb+");
 	if (in)
 	{
-		long size, i, sizebig;
+		long size, i;
 		unsigned char *buf;
 		
 		fseek( in, 0, SEEK_END);
 		size = ftell( in);
 		printf( "file size is %ld\n", size);
 		rewind( in);
-		sizebig = (size / 512 + 1) * 512;
-		buf = malloc( sizebig);
+		buf = malloc( size);
 		if (buf)
 		{
 			int sum = 0;
@@ -70,9 +69,12 @@ int main( int argc, char *argv[])
 					int padsize = sizecomp * 512 - size - 2;
 					if (padsize > 0)
 					{
+						char *buf2 = malloc( padsize);
+						
 						printf( "padding %d bytes\n", padsize);
-						memset( buf, 0x00, padsize);
-						fwrite( buf, padsize, 1, in);
+						memset( buf2, 0x00, padsize);
+						fwrite( buf2, padsize, 1, in);
+						free( buf2);
 					}
 //					unsigned short w = pad;
 //					fwrite( &w, sizeof( w), 1, in);
