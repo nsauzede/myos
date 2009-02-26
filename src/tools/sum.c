@@ -20,14 +20,15 @@ int main( int argc, char *argv[])
 	in = fopen( name, "rb+");
 	if (in)
 	{
-		long size, i;
+		long size, i, sizebig;
 		unsigned char *buf;
 		
 		fseek( in, 0, SEEK_END);
 		size = ftell( in);
 		printf( "file size is %ld\n", size);
 		rewind( in);
-		buf = malloc( size);
+		sizebig = (size / 512 + 1) * 512;
+		buf = malloc( sizebig);
 		if (buf)
 		{
 			int sum = 0;
