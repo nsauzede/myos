@@ -20,7 +20,7 @@ int main( int argc, char *argv[])
 		printf( "usage: mkrom in out\n");
 		exit( 1);
 	}
-	printf( "inpu is [%s] output is [%s]\n", name, name2);
+	printf( "input is [%s] output is [%s]\n", name, name2);
 	in = fopen( name, "rb+");
 	if (in)
 	{

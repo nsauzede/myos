@@ -43,7 +43,7 @@ int main( int argc, char *argv[])
 			printf( "stored size=%d\n", sizeread);
 			sizecomp = size / 512;
 			if (size % 512)
-				size++;
+				sizecomp++;
 			printf( "computed size=%d : ", sizecomp);
 			for (i = 0; i < size; i++)
 			{
