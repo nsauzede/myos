@@ -41,7 +41,9 @@ int main( int argc, char *argv[])
 			}
 			sizeread = buf[2];
 			printf( "stored size=%d\n", sizeread);
-			sizecomp = (size / 512) + 1;
+			sizecomp = size / 512;
+			if (size % 512)
+				size++;
 			printf( "computed size=%d : ", sizecomp);
 			for (i = 0; i < size; i++)
 			{
