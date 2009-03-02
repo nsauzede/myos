@@ -111,6 +111,10 @@ int mprintf( const char *fmt, ...)
 						chr = va_arg( ap, typeof( chr));
 						dputchar( chr);
 						break;
+					case 's':
+						ptr = va_arg( ap, typeof( ptr));
+						dputs( ptr);
+						break;
 #if 0
 					case 'd':
 						ptr = va_arg( ap, typeof( ptr));

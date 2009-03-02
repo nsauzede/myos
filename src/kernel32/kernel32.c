@@ -4,6 +4,8 @@
 #include "ioport.h"
 #include "idt.h"
 
+#include "tasks.h"
+
 unsigned char stack[0x4000] = {
 	[0] = 0xde,
 	[sizeof(stack) - 1] = 0xef
@@ -60,6 +62,61 @@ void div_handler( int id, uint32_t ebp)
 	divs++;
 }
 
+int t1( struct pt *pt, int tid, void *arg)
+{
+	int startl = (int)arg;
+	PT_BEGIN( pt);
+	
+	while (1)
+	{
+		static int count = 0;
+		static int div = 0;
+		
+		gotoxy( 0, startl + 0);
+		printf( "%s: looping.. #%08lx jif=%08lx kb=%p divs=%p div=%x", __func__, (void *)count++, jiffies, kbhits, divs, div);
+		gotoxy( 0, startl + 1);
+		int j;
+		for (j = 0; j < KB_SIZE; j++)
+		{
+			printf( "%02x%c", kb_ring[j], j == kb_head ? '<' : ' ');
+		}
+		PT_YIELD( pt);
+	}
+	PT_END( pt);
+}
+
+int t2( struct pt *pt, int tid, void *arg)
+{
+	int startl = (int)arg;
+	PT_BEGIN( pt);
+	
+	while (1)
+	{
+		static int count = 0;
+		
+		gotoxy( 0, startl + 0);
+		printf( "%s: looping.. #%08lx jif=%08lx kb=%x divs=%x", __func__, (void *)count++, jiffies, kbhits, divs);
+		PT_YIELD( pt);
+	}
+	PT_END( pt);
+}
+
+int scheduler()
+{
+	init_tasks();
+	create_task( t1, (void *)6);
+	create_task( t2, (void *)9);
+	while (1)
+	{
+		static int count = 0;
+		gotoxy( 0, 3);
+		printf( "%s: having some hlt.. %x\n", __func__, count++);
+		asm volatile( "hlt");
+		schedule_tasks();
+	}
+	return 0;
+}
+
 void kernel_main()
 {
 	console_init();		// this will initialize internal console data for subsequent printouts
@@ -78,31 +135,8 @@ void kernel_main()
 	i8254_set_freq( 1);
 
 	asm volatile( "sti");	
-	
-	int i = 1;
-	printf( "\n");
-	while (1)
-	{
-		static int count = 0;
-		static int div = 0;
-		
-		gotoxy( 0, 3);
-		printf( "\rlooping.. #%08lx jif=%08lx kb=%p divs=%p div=%x", (void *)count++, jiffies, kbhits, divs, div);
-//		asm volatile( "int $0");
-#if 0
-		asm volatile( "mov $0x12345678,%%ecx;mov $0xdeadbeef,%%ebx;mov $0xcafedeca,%%eax;idivl %0"::"g"(i):"eax");
-		div = 1 / i;
-#endif
-		if (i)i--;
 
-		gotoxy( 0, 4);
-		int j;
-		for (j = 0; j < KB_SIZE; j++)
-		{
-			printf( "%02x%c", kb_ring[j], j == kb_head ? '<' : ' ');
-		}
-		asm volatile( "hlt");
-	}
+	scheduler();	// infinite loop, with hlt's
 	
 	printf( "*system32 halted*");
 	while (1)
