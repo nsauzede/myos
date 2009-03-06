@@ -65,6 +65,7 @@ pop bp
 pop ds
 ret
 
+%if 1
 printw0:
 db '????'
 printw0end:
@@ -105,3 +106,62 @@ pop ax
 pop bx
 pop si
 ret
+%else	; this was just to test AAM [n] ; broken, don't use
+; bx=word ah=len (1-4)
+printw:
+push ax
+push bx
+push cx
+mov cl,ah
+mov al,bh
+aam 16
+xchg al,ah
+cmp al,9
+jg .grt
+add al,'0'
+jmp .ngrt
+.grt:
+add al,'a'-10
+.ngrt:
+call print1
+dec cl
+jz .end
+mov al,ah
+cmp al,9
+jg .grt2
+add al,'0'
+jmp .ngrt2
+.grt2:
+add al,'a'-10
+.ngrt2:
+call print1
+dec cl
+jz .end
+mov al,bl
+aam 16
+xchg ah,al
+cmp al,9
+jg .grt3
+add al,'0'
+jmp .ngrt3
+.grt3:
+add al,'a'-10
+.ngrt3:
+call print1
+dec cl
+jz .end
+mov al,ah
+cmp al,9
+jg .grt4
+add al,'0'
+jmp .ngrt4
+.grt4:
+add al,'a'-10
+.ngrt4:
+call print1
+.end
+pop cx
+pop bx
+pop ax
+ret
+%endif

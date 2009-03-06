@@ -1,6 +1,10 @@
 
 MyOS : a very simple, self-teaching, educational operating system.
+
 Copyright (C) Nicolas Sauzede 2009.
+
+Some parts inspired on SOS : (another educational operating system)
+http://sos.enix.org/
 
 This project was started to learn by myself how operating systems are
 written and work at their lowest level.
@@ -9,18 +13,19 @@ It is focused mainly on intel x86 architecture.
 KEYWORDS : os boot loaders, 16/32 bit assemby, real/protected mode,
 segmentation, interrupts, multi-tasking, etc..
 
-Basically composed of x86 code, comprising a bootloader and a kernel (two in fact).
+Basically composed of x86 code, comprising a bootloader and a kernel
+(well two in fact).
 
 The main target is emulation via qemu, as a bios rom extension or a 
 bootable floppy disk image.
 But it should also run as well on a real machine.
 
--the loader is a nasm x86 assembly code, managing 16/32 bit kernels.
--the 16 bit kernel is pure nasm 16 bit code
+-the loader is a nasm x86 assembly code, bootstrapping 16/32 bit kernels.
+-the 16 bit kernel is pure nasm 16 bit real mode code.
 -the 32 bit kernel is plain ANSI C code, running in 32 bit protected mode,
-with one small gas assembly boot code.
+with one small gas assembly start code.
 
 See doc/specs.txt for more technical details / general low level OS infos.
 
-Developped under GPLv2 license (see LICENSE file)
+Developped and released under GPLv2+ license (see LICENSE file)
 

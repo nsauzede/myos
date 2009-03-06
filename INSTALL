@@ -1,0 +1,36 @@
+
+If you have qemu PC emulator installed, you can test MyOS quickly
+at the project root directory :
+
+-test 16 bit kernel as a floppy
+make clean check
+
+-test 16 bit kernel as a rom extension
+make clean checkr
+
+-test 32 bit kernel as a floppy
+make clean check32
+
+-test 32 bit kernel as a rom extension
+make clean check32r
+
+
+-to compile everything, ie: 16/32 bit kernels, as floppy/rom extension :
+
+make clean all
+
+
+
+Output files description :
+
+fd.img			: 16 bit kernel as a bootable floppy disk image
+romext.rom		: 16 bit kernel as a bios rom extension
+fd32.img		: 32 bit kernel as a bootable floppy disk image
+romext32.rom	: 32 bit kernel as a bios rom extension
+
+*.img files may be written to a real floppy disk (1.44MiB format)
+and booted on a real machine, or with an emulator (see below)
+*.rom files may be written to a physical EEPROM (such as eg: 2764)
+plugged to some network card with a rom extension socket and booted
+on a real machine, or with an emulator (see below)
+
