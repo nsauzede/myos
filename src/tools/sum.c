@@ -17,8 +17,12 @@ int main( int argc, char *argv[])
 				mod = 1;
 		}
 	}
-	in = fopen( name, "rb+");
-	if (in)
+	in = fopen( name, "rb");
+	if (!in)
+	{
+		printf( "couldn't open '%s' !\n", name);
+	}
+	else
 	{
 		long size, i;
 		unsigned char *buf;
@@ -62,7 +66,8 @@ int main( int argc, char *argv[])
 				printf( "mismatch should be %04X\n", (unsigned short)pad);
 				if (mod)
 				{
-					rewind(in);
+					fclose( in);
+					in = fopen( name, "rb+");
 					buf[2] = sizecomp;
 //					buf[size - 2] = 0;
 //					buf[size - 1] = pad;
