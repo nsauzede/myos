@@ -1,4 +1,4 @@
-TARGET=mkrom sum
+TARGET=mkrom.exe sum
 
 CFLAGS=-Wall -Werror
 CFLAGS+=-g -O0 -fno-omit-frame-pointer
@@ -9,7 +9,7 @@ endif
 
 all:	$(TARGET)
 
-%:	%.c
+%.exe:	%.c
 	$(CC) -o $(P)/$@ $(CFLAGS) $^ $(LDFLAGS)
 
 clean:

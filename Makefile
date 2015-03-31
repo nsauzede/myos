@@ -1,8 +1,8 @@
 TARGET=fd.img fd32.img romext.rom romext32.rom
 
-QEMU=qemu
+QEMU=qemu-system-x86_64
 QEMU+=-m 3
-QEMU+=-cpu 486 -std-vga
+QEMU+=-cpu 486 -vga std
 ifdef T
 QEMU+=-S -s
 endif
@@ -27,3 +27,5 @@ check32r:	romext32.rom
 clean:
 	$(RM) $(TARGET)
 	$(MAKE) -C src $@
+
+clobber: clean

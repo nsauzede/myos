@@ -27,11 +27,11 @@ loader.sec:
 loader.rom:
 	$(MAKE) -C loader $@ P=`pwd`
 
-romext.rom:	mkrom romext.bin
-	./mkrom romext.bin $(P)/$@
+romext.rom:	mkrom.exe romext.bin
+	./mkrom.exe romext.bin $(P)/$@
 
-romext32.rom:	mkrom romext32.bin
-	./mkrom romext32.bin $(P)/$@
+romext32.rom:	mkrom.exe romext32.bin
+	./mkrom.exe romext32.bin $(P)/$@
 
 $(KERNEL16):
 	$(MAKE) -C kernel16 $@ P=`pwd`
