@@ -13,3 +13,6 @@ all:	$(TARGET)
 
 clean:
 	$(RM) $(TARGET) *.bin
+
+clobber:
+	$(RM) *~

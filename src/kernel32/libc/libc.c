@@ -75,7 +75,7 @@ int mprintf( const char *fmt, ...)
 	if (fmt)
 	while (*fmt)
 	{
-		int upper = 0;
+//		int upper = 0;	//TODO
 		int size = -1;
 		int fixed = 0;
 		if (*fmt == '%')
@@ -93,7 +93,7 @@ int mprintf( const char *fmt, ...)
 						continue;
 						break;
 					case 'X':
-						upper = 1;
+//						upper = 1;	//TODO
 					case 'p':
 					case 'x':
 						ptr = va_arg( ap, typeof( ptr));

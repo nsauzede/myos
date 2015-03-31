@@ -16,3 +16,6 @@ all:	$(TARGET)
 
 clean:
 	$(RM) $(TARGET) *.sec
+
+clobber:
+	$(RM) *~

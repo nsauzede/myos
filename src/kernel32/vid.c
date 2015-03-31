@@ -9,11 +9,13 @@ static int col = 0;
 static int row = 0;
 static unsigned char attr = 0;
 
+extern void setattr() asm ("setattr");
 void setattr( int _attr)
 {
     attr = _attr;
 }
 
+extern void home() asm ("home");
 void home()
 {
 	gotoxy( 0, 0);
@@ -93,6 +95,7 @@ void dputs( const char *s)
     }
 }
 
+extern void setcursor() asm ("setcursor");
 void setcursor( int x, int y)
 {
 	int loc;
@@ -111,13 +114,13 @@ void setcursor( int x, int y)
 
 void setmode03( void)
 {
-	void _setmode03();
-	_setmode03();
+	extern void _asm_setmode03() asm ("_asm_setmode03");
+	_asm_setmode03();
 }
 
 void setmode13( void)
 {
-	void _setmode13();
-	_setmode13();
+	extern void _asm_setmode13() asm ("_asm_setmode13");
+	_asm_setmode13();
 	memset( (void *)0xa0000,0,320*200);
 }

@@ -1,4 +1,4 @@
-TARGET=	mkrom
+TARGET=	mkrom.exe
 
 ifndef P
 P=.
@@ -39,11 +39,18 @@ $(KERNEL16):
 kernel32.bin:
 	$(MAKE) -C kernel32 $@ P=`pwd`
 
-mkrom:
+mkrom.exe:
 	$(MAKE) -C tools $@ P=`pwd`
 
 clean:
 	$(RM) $(TARGET) *.img *.sec *.bin *.rom
+	$(MAKE) -C tools $@
+	$(MAKE) -C loader $@
+	$(MAKE) -C kernel16 $@
+	$(MAKE) -C kernel32 $@
+
+clobber: clean
+	$(RM) *~
 	$(MAKE) -C tools $@
 	$(MAKE) -C loader $@
 	$(MAKE) -C kernel16 $@

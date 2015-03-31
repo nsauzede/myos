@@ -1,7 +1,7 @@
 bits 32
 
-global _setmode03
-global _setmode13
+global _asm_setmode03
+global _asm_setmode13
 
 _mode3:
 	db 67H,00H,03H,00H,03H,00H,02H
@@ -42,13 +42,13 @@ showcursor:
 ;	IODELAY
 	ret
 
-_setmode03:
+_asm_setmode03:
 	mov si,_mode3
 	call _setmode
 	call _setfont
 	ret
 
-_setmode13:
+_asm_setmode13:
 	mov si,_mode13h
 	call _setmode
 	ret

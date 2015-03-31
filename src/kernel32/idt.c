@@ -31,10 +31,10 @@ typedef struct idte {
 #define IDT_NUM IDT_MAX
 static idte_t idt[IDT_NUM];
 
-extern void *idt_wrappers[IDT_NUM];
-extern void *def_int_wrappers[IDT_NUM];
+extern void *idt_wrappers[IDT_NUM] asm("idt_wrappers");
+extern void *def_int_wrappers[IDT_NUM] asm("def_int_wrappers");
 
-idt_handler_t idt_handlers[IDT_NUM];
+idt_handler_t idt_handlers[IDT_NUM] asm("idt_handlers");
 
 void hlt()
 {

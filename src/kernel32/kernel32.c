@@ -6,7 +6,7 @@
 
 #include "tasks.h"
 
-unsigned char stack[0x4000] = {
+unsigned char stack[0x4000] asm("stack") = {
 	[0] = 0xde,
 	[sizeof(stack) - 1] = 0xef
 };
@@ -17,6 +17,9 @@ void int_handler( int id, uint32_t _ebp,
 	uint32_t code, uint32_t eip, uint32_t cs, uint32_t eflags
 	)
 {
+	extern void home() asm ("home");
+	extern void setattr() asm ("setattr");
+	extern void setcursor() asm ("setcursor");
 	home();
 	setattr( BG_BLACK | FG_RED);
 	printf( "int#%p: ", id);
@@ -117,6 +120,7 @@ int scheduler()
 	return 0;
 }
 
+extern void kernel_main() asm("kernel_main");
 void kernel_main()
 {
 	console_init();		// this will initialize internal console data for subsequent printouts

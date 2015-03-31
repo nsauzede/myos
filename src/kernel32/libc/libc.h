@@ -21,6 +21,6 @@ void setattr( int attr);
 void dputs( const char *s);
 
 #define printf mprintf
-int mprintf( const char *fmt, ...);
+int mprintf( const char *fmt, ...) asm ("mprintf");
 
 #endif/*__LIBC_H__*/

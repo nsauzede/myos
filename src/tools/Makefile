@@ -14,3 +14,6 @@ all:	$(TARGET)
 
 clean:
 	$(RM) $(TARGET)
+
+clobber:
+	$(RM) *~
