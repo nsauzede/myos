@@ -219,8 +219,8 @@ kernel_begin:
 
 %assign usedlen (end - start)
 %assign freelen (512 - usedlen - 2)
-%error ========= LOADER STATISTICS ==============================
-%error ========= used size=usedlen
+%warning ========= LOADER STATISTICS ==============================
+%warning ========= used size=usedlen
 %ifdef SECTOR
-%error ========= space left=freelen
+%warning ========= space left=freelen
 %endif
