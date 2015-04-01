@@ -16,10 +16,10 @@ check32:	fd32.img
 	$(QEMU) -fda $< -boot a
 
 checkr:	romext.rom
-	$(QEMU) -option-rom $< /dev/zero
+	$(QEMU) -option-rom $<
 
 check32r:	romext32.rom
-	$(QEMU) -option-rom $< /dev/zero
+	$(QEMU) -option-rom $<
 
 %:
 	$(MAKE) -C src $@ P=`pwd`
@@ -29,3 +29,5 @@ clean:
 	$(MAKE) -C src $@
 
 clobber: clean
+	$(RM) *~
+	$(MAKE) -C src $@ P=`pwd`
