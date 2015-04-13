@@ -36,7 +36,7 @@ kernel32.elf:	boot.o kernel32.o vid.o _vid.o vid.o libc.o tasks.o idt.o idt_wrap
 	$(CC) -o $@ $^ -static $(LDFLAGS) -e kernel_main
 
 kernel32.bin:	kernel32.elf
-	objcopy -O binary $^ $(P)/$@
+	objcopy --remove-section=.note.gnu.build-id -O binary $^ $(P)/$@
 
 clean:
 	$(RM) $(TARGET) *.o *.bin *.elf
