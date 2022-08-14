@@ -8,7 +8,7 @@
 #pragma pack(1)
 typedef struct idtr {
 	uint16_t limit;
-	uint32_t base_addr;
+	uint64_t base_addr;
 } idtr_t;
 #pragma pack()
 
@@ -24,7 +24,8 @@ typedef struct idte {
 	uint8_t zero:1;
 	uint8_t dpl:2;
 	uint8_t present:1;
-	uint16_t offset_high;
+	uint16_t offset_higha;
+	uint32_t offset_highb;
 } idte_t;
 #pragma pack()
 
@@ -83,14 +84,16 @@ void idt_set_handler( int num, idt_handler_t handler)
 	if (!handler)
 	{
 		idte->offset_low = 0;
-		idte->offset_high = 0;
+		idte->offset_higha = 0;
+		idte->offset_highb = 0;
 		idte->dpl = 0;
 		idte->present = 0;
 	}
 	else
 	{
 		idte->offset_low = (typeof(idte->offset_low))(uintptr_t)handler & 0xFFFF;
-		idte->offset_high = ((typeof(idte->offset_high))(uintptr_t)handler >> 16) & 0xFFFF;
+		idte->offset_higha = ((typeof(idte->offset_higha))(uintptr_t)handler >> 16) & 0xFFFF;
+		idte->offset_highb = ((typeof(idte->offset_highb))((uintptr_t)handler >> 32)) & 0xFFFFFFFF;
 		idte->dpl = 0;
 		idte->present = 1;
 	}

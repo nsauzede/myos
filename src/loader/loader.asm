@@ -68,6 +68,9 @@ pop ds
 %if 1
 
 mov al,[kernel_begin+1]
+cmp al,2
+je is64					; shall we switch to long mode now ? (if 64 bit kernel)
+
 cmp al,1
 jne nprotect				; shall we switch to protected mode now ? (if 32 bit kernel)
 
@@ -105,6 +108,17 @@ jmp inf32
 bits 16
 
 jmp protectdone
+
+is64:
+; we are about to switch to 64 bit long mode
+call is64bit0
+is64bit db "kernel is 64 bit",13,10,0
+is64bit0:
+pop si
+call print
+inf64:
+hlt
+jmp inf64
 
 nprotect:
 call is16bit0

@@ -120,14 +120,23 @@ int scheduler()
 	return 0;
 }
 
+asm(
+".globl s\n"
+"s: .string \"Hello 64bit World!\\n\"\n"
+);
+extern char s[];
 extern void kernel_main() asm("kernel_main");
 void kernel_main()
 {
 	console_init();		// this will initialize internal console data for subsequent printouts
-	
-	printf( "\n\n");	// leave first lines for interrupts
-	printf( "hello kernel32 - kernel_main=[%p]\n", kernel_main);
-	
+//	dputchar('A');
+//	dputchar('\n');
+//	dputchar('B');
+	dputs(s);
+//	dputs("hello\nWorld!\n");
+//	printf( "\n\n");	// leave first lines for interrupts
+//	printf( "hello kernel64 - kernel_main=[%p]\n", kernel_main);
+#if 0	
 	idt_setup();		// init idt with default int handlers
 
 //	exception_set_handler( EXCEPTION_DIVIDE, div_handler);
@@ -142,7 +151,8 @@ void kernel_main()
 
 	scheduler();	// infinite loop, with hlt's
 	
-	printf( "*system32 halted*");
+	printf( "*system64 halted*");
+#endif
 	while (1)
 	{
 		asm volatile( "hlt");
