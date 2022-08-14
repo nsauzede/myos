@@ -30,9 +30,9 @@ check32r:	romext32.rom
 	$(MAKE) -C src $@ P=`pwd`
 
 clean:
-	$(RM) $(TARGET)
-	$(MAKE) -C src $@
+	@$(RM) $(TARGET)
+	@$(MAKE) -s -C src $@
 
 clobber: clean
-	$(RM) *~
-	$(MAKE) -C src $@ P=`pwd`
+	@$(RM) *~
+	@$(MAKE) -s -C src $@ P=`pwd`

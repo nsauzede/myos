@@ -10,6 +10,8 @@ Run the 16-bit kernel as a floppy boot sector:
 ```
 $ make check
 ```
+You should see this after typing 'abcd' (0x1e, 0x30, 0x2e, 0x20) on the keyboard:
+![kernel16 screenshot](debug/kernel16.png)
 
 Debug the 16-bit boot part nicely in real-mode:
 ```shell
