@@ -1,7 +1,33 @@
-
-MyOS : a very simple, self-teaching, educational operating system.
+# MyOS
+A very simple, self-teaching, educational operating system.
 
 Copyright (C) Nicolas Sauzede 2009.
+
+# How to test it
+Required tools: qemu-system-i386, nasm, gcc and make (and optionally gdb for debug)
+
+Run the 16-bit kernel as a floppy boot sector:
+```
+$ make check
+```
+
+Debug the 16-bit boot part nicely in real-mode:
+```shell
+$ make check_dbg
+...
+real-mode-gdb$ tb *0x7c00
+Temporary breakpoint 1 at 0x7c00
+real-mode-gdb$ c
+```
+You should then see the first instructions of the 16-bit loader:
+```
+---------------------------[ CODE ]----
+=> 0x7c00:      cli
+   0x7c01:      push   cs
+   0x7c02:      pop    ds
+```
+
+# About the project
 
 Some parts inspired on SOS : (another educational operating system)
 http://sos.enix.org/
@@ -32,4 +58,3 @@ some trickery concerning some asm symbol names, as inspired by this post :
 http://stackoverflow.com/questions/1034852/adding-leading-underscores-to-assembly-symbols-with-gcc-on-win32
 
 Developped and released under GPLv2+ license (see LICENSE file)
-

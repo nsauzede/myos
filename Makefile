@@ -1,25 +1,30 @@
-TARGET=fd.img fd32.img romext.rom romext32.rom
+TARGET:=fd.img fd32.img romext.rom romext32.rom
 
-QEMU=qemu-system-x86_64
-QEMU+=-m 3
-QEMU+=-cpu 486 -vga std
+QEMU:=qemu-system-i386
+QEMUOPTS:=-m 3
+QEMUOPTS+=-cpu 486 -vga std
 ifdef T
-QEMU+=-S -s
+QEMUOPTS+=-S -s
 endif
+GDB:=gdb
 
 all:	$(TARGET)
 
 check:	fd.img
-	$(QEMU) -fda $< -boot a
+	$(QEMU) $(QEMUOPTS) -fda $< -boot a
 
 check32:	fd32.img
-	$(QEMU) -fda $< -boot a
+	$(QEMU) $(QEMUOPTS) -fda $< -boot a
 
 checkr:	romext.rom
-	$(QEMU) -option-rom $<
+	$(QEMU) $(QEMUOPTS) -option-rom $<
 
 check32r:	romext32.rom
-	$(QEMU) -option-rom $<
+	$(QEMU) $(QEMUOPTS) -option-rom $<
+
+%_dbg:
+	$(MAKE) $* QEMU=qemu-system-i386 T=1 &
+	(cd debug ; $(GDB) -ix gdbinit_real_mode.txt -ex 'set tdesc filename target.xml' -ex 'target remote :1234')
 
 %:
 	$(MAKE) -C src $@ P=`pwd`
