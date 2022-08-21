@@ -19,7 +19,7 @@ _kernel_start:
 
 #ifdef START_IN_REALM	// only if not done in loader
 // This direct-switch-to-long-mode code heavily inspired from https://wiki.osdev.org/Entering_Long_Mode_Directly
-#define FREE_SPACE      0x9000
+#define FREE_SPACE      0x3000          // paging table up to 0x7000
 #define PAGE_PRESENT    (1 << 0)
 #define PAGE_WRITE      (1 << 1)
 #define CODE_SEG        0x0008
@@ -32,8 +32,7 @@ ljmp $0,$.FlushCS
 .FlushCS:
 xor %eax,%eax
 mov %ax,%ss
-//mov $.start,%sp
-mov $0x7c00,%sp
+mov $0x3000,%sp         // below paging tables
 mov %ax,%ds
 mov %ax,%es
 mov %ax,%fs
@@ -44,17 +43,17 @@ mov $0x1000,%ecx
 cld
 rep stos %eax,%es:(%di)
 pop %di
-lea %es:0x1000(%di),%eax
+lea 0x1000(%di),%eax                        // PML4
 or $(PAGE_PRESENT | PAGE_WRITE),%eax
 mov %eax,%es:(%di)
-lea %es:0x2000(%di),%eax
+lea 0x2000(%di),%eax                        // PDPT
 or $(PAGE_PRESENT | PAGE_WRITE),%eax
 mov %eax,%es:0x1000(%di)
-lea %es:0x3000(%di),%eax
+lea 0x3000(%di),%eax                        // PDT
 or $(PAGE_PRESENT | PAGE_WRITE),%eax
 mov %eax,%es:0x2000(%di)
 push %di
-lea 0x3000(%di),%di
+lea 0x3000(%di),%di                         // PT
 mov $(PAGE_PRESENT | PAGE_WRITE),%eax
 .LoopPageTable:
 mov %eax,%es:(%di)
@@ -70,6 +69,7 @@ nop
 nop
 lidt (IDT)
 lgdt (GDT.Pointer)
+
 mov $DATA_SEG,%ax
 mov %ax,%ds
 mov %ax,%es
@@ -114,19 +114,10 @@ IDT:
 .code64
 
 LongMode:
-/*
-mov $0xb8000,%edi
-mov $500,%ecx
-mov $0x1F201F201F201F20,%rax
-rep stos %rax,%es:(%rdi)
-mov $0xb8000,%edi
-mov $0x1F6C1F6C1F651F48,%rax
-mov %rax,%ds:(%edi)
-mov $0x1F341F361F201F6F,%rax
-mov %rax,%ds:8(%edi)
-mov $0x1F211F741F691F62,%rax
-mov %rax,%ds:16(%edi)
-*/
+// enable A20
+in $0x92,%al
+or $2,%al
+out %al,$0x92
 
 _kernel_entry:
 Here64:

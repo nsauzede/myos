@@ -76,7 +76,7 @@ jne nprotect				; shall we switch to protected mode now ? (if 32 bit kernel)
 
 ; we are about to switch to 32 bit protected mode
 call is32bit0
-is32bit db "kernel is 32 bit",13,10,0
+is32bit db `kernel is 32 bit\r\n`,0
 is32bit0:
 pop si
 call print
@@ -112,7 +112,7 @@ jmp protectdone
 is64:
 ; we are about to switch to 64 bit long mode
 call is64bit0
-is64bit db "kernel is 64 bit",13,10,0
+is64bit db `kernel is 64 bit\r\n`,0
 is64bit0:
 pop si
 call print
@@ -122,7 +122,7 @@ jmp inf64
 
 nprotect:
 call is16bit0
-is16bit db "kernel is 16 bit",13,10,0
+is16bit db `kernel is 16 bit\r\n`,0
 is16bit0:
 pop si
 call print
@@ -194,7 +194,7 @@ cld
 rep movsd
 %endif
 call scrlf0
-scrlf db 13,10,0
+scrlf db `\r\n`,0
 scrlf0:
 pop si
 call print

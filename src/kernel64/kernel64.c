@@ -6,7 +6,7 @@
 
 #include "tasks.h"
 
-unsigned char stack[0x4000] asm("stack") = {
+unsigned char stack[0x100] asm("stack") = {
 	[0] = 0xde,
 	[sizeof(stack) - 1] = 0xef
 };
@@ -120,23 +120,14 @@ int scheduler()
 	return 0;
 }
 
-asm(
-".globl s\n"
-"s: .string \"Hello 64bit World!\\n\"\n"
-);
-extern char s[];
 extern void kernel_main() asm("kernel_main");
 void kernel_main()
 {
 	console_init();		// this will initialize internal console data for subsequent printouts
-//	dputchar('A');
-//	dputchar('\n');
-//	dputchar('B');
-	dputs(s);
-//	dputs("hello\nWorld!\n");
-//	printf( "\n\n");	// leave first lines for interrupts
-//	printf( "hello kernel64 - kernel_main=[%p]\n", kernel_main);
-#if 0	
+	
+	printf( "\n\n");	// leave first lines for interrupts
+	printf( "hello kernel64 - kernel_main=[%p]\n", kernel_main);
+	
 	idt_setup();		// init idt with default int handlers
 
 //	exception_set_handler( EXCEPTION_DIVIDE, div_handler);
@@ -152,7 +143,6 @@ void kernel_main()
 	scheduler();	// infinite loop, with hlt's
 	
 	printf( "*system64 halted*");
-#endif
 	while (1)
 	{
 		asm volatile( "hlt");

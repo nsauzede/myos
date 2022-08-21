@@ -17,7 +17,7 @@ dw LOAD_OFS
 kernel_main:
 jmp _kernel_entry
 
-sgreet db "hello kernel16 - kernel_main=[%p]",13,10,0
+sgreet db `hello kernel16 - kernel_main=[%p]\r\n`,0
 
 ; multiboot header
 magic dd 0x1badb002
@@ -262,7 +262,7 @@ int 1
 jmp loop0
 ;----------------------------------------------------------------------
 
-sloop db "looping.. #%x jif=%x kb=%x divs=%x div=%x",13,10,0
+sloop db `looping.. #%x jif=%x kb=%x divs=%x div=%x\r\n`,0
 skb db "%02x%c",0
 
 %if 1
