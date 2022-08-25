@@ -3,9 +3,13 @@ TARGET=	kernel64.bin
 ifndef P
 P=.
 endif
+COMMON:=../common
+LIBC:=../common/libc
+PT:=../common/pt
 
 CFLAGS=-Wall -Werror
 CFLAGS+=-g -O0 -fno-omit-frame-pointer
+CFLAGS+=-I$(COMMON) -I$(LIBC) -I$(PT)
 
 NASM=nasm
 
@@ -18,6 +22,9 @@ KCFLAGS=-DKERNEL_ADDR=$(KERNEL_TEXT) -I . -I libc -I pt
 
 all:	$(TARGET)
 
+%.o:    $(COMMON)/%.c
+	$(CC) -c -o $@ $(CFLAGS) $<
+
 %.o:    %.asm
 	$(NASM) -f elf64 -o $@ $<
 
@@ -27,7 +34,7 @@ boot.o: boot.S
 idt_wrappers.o: idt_wrappers.S
 	$(CC) -c -o $@ $(CFLAGS) $< -DASSEMBLY
 
-libc.o:	libc/libc.c
+libc.o:	$(LIBC)/libc.c
 	$(CC) -c -o $@ $(CFLAGS) $<
 
 M64:=1
