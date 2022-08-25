@@ -57,6 +57,10 @@ int dputchar( int c)
         }
         if (!skip)
         {
+            if (col >= MAX_COL) {
+                col = 0;
+                row++;
+            }
             ptr[(row * 80 + col) * 2] = c;
             ptr[(row * 80 + col) * 2 + 1] = attr;
             if (col < MAX_COL)
@@ -86,10 +90,15 @@ void dputs( const char *s)
         }
         if (!skip)
         {
+            if (col >= MAX_COL) {
+                col = 0;
+                row++;
+            }
             ptr[(row * 80 + col) * 2] = *s;
             ptr[(row * 80 + col) * 2 + 1] = attr;
-            if (col < MAX_COL)
+            if (col < MAX_COL) {
                 col++;
+            }
         }
         s++;
     }

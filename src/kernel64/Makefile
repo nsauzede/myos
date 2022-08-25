@@ -1,4 +1,4 @@
-TARGET=	kernel32.bin
+TARGET=	kernel64.bin
 
 ifndef P
 P=.
@@ -26,7 +26,7 @@ all:	$(TARGET)
 	$(CC) -c -o $@ $(CFLAGS) $<
 
 %.o:    %.asm
-	$(NASM) -f elf -o $@ $<
+	$(NASM) -f elf64 -o $@ $<
 
 boot.o: boot.S
 	$(CC) -c -o $@ $(CFLAGS) $<
@@ -37,12 +37,18 @@ idt_wrappers.o: idt_wrappers.S
 libc.o:	$(LIBC)/libc.c
 	$(CC) -c -o $@ $(CFLAGS) $<
 
-kernel32.elf:	CFLAGS+=-m32 -fno-stack-protector $(KCFLAGS)
-kernel32.elf:	LDFLAGS+=-m32 $(KLDFLAGS)
-kernel32.elf:	boot.o kernel32.o vid.o _vid.o vid.o libc.o tasks.o idt.o idt_wrappers.o
+M64:=1
+ifdef M64
+MODE:=-m64
+else
+MODE:=-m32
+endif
+kernel64.elf:	CFLAGS+=$(MODE) -fno-stack-protector $(KCFLAGS)
+kernel64.elf:	LDFLAGS+=$(MODE) $(KLDFLAGS)
+kernel64.elf:	boot.o kernel64.o vid.o _vid.o vid.o libc.o tasks.o idt.o idt_wrappers.o
 	$(CC) -o $@ $^ -static $(LDFLAGS) -e kernel_main
 
-kernel32.bin:	kernel32.elf
+kernel64.bin:	kernel64.elf
 	objcopy --remove-section=.note.gnu.build-id -O binary $^ $(P)/$@
 
 clean:
