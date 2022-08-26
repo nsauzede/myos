@@ -12,19 +12,22 @@ GDB:=gdb
 all:	$(TARGET)
 
 check:	fd.img
-	$(QEMU) $(QEMUOPTS) -fda $< -boot a
+#	$(QEMU) $(QEMUOPTS) -fda $< -boot a
+	$(QEMU) $(QEMUOPTS) -drive format=raw,file=$<
 
 checkr:	romext.rom
 	$(QEMU) $(QEMUOPTS) -option-rom $<
 
 check32:	fd32.img
-	$(QEMU) $(QEMUOPTS) -fda $< -boot a
+#	$(QEMU) $(QEMUOPTS) -fda $< -boot a
+	$(QEMU) $(QEMUOPTS) -drive format=raw,file=$<
 
 check32r:	romext32.rom
 	$(QEMU) $(QEMUOPTS) -option-rom $<
 
 check64:	fd64.img
 	$(QEMU64) $(QEMUOPTS) -fda $< -boot a
+#	$(QEMU64) $(QEMUOPTS) -drive format=raw,file=$<
 
 check64r:	romext64.rom
 	$(QEMU64) $(QEMUOPTS) -option-rom $<

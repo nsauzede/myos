@@ -166,7 +166,9 @@ copy:					; copy the kernel to its load address before running it
 %ifdef SECTOR
 mov ax,0x0202
 mov cx,0x0001
-mov dx,0x0000				; 01=head1 00=fda
+;mov dx,0x0000				; 01=head1 00=fda
+mov dh,0x00				; 01=head1
+;mov dx,0x0080				; 01=head1 00=fda
 xor bx,bx
 mov es,bx
 mov bx,LOADER_OFS
