@@ -26,8 +26,8 @@ check32r:	romext32.rom
 	$(QEMU) $(QEMUOPTS) -option-rom $<
 
 check64:	fd64.img
-	$(QEMU64) $(QEMUOPTS) -fda $< -boot a
-#	$(QEMU64) $(QEMUOPTS) -drive format=raw,file=$<
+#	$(QEMU64) $(QEMUOPTS) -fda $< -boot a
+	$(QEMU64) $(QEMUOPTS) -drive format=raw,file=$<
 
 check64r:	romext64.rom
 	$(QEMU64) $(QEMUOPTS) -option-rom $<
@@ -37,8 +37,9 @@ check64r:	romext64.rom
 	(cd debug ; $(GDB) -ix gdbinit_real_mode.txt -ex 'set tdesc filename target.xml' -ex 'target remote :1234')
 
 check64_dbg:
-	$(MAKE) check64 T=1 &
-	$(GDB) -ex 'set confirm off' -ex 'target remote :1234' -ex 'disp/i$$cs*16+(unsigned short)$$rip' -ex 'disp/8bx$$cs*16+(unsigned short)$$rip' -ex 'disp/x$$rax' -ex 'disp/x$$rbx' -ex 'disp/x$$cs' -ex 'disp/x$$rip' -ex 'file src/kernel64/kernel64.elf' -ex 'b kernel_main'
+#	$(MAKE) check64 T=1 &
+#	$(GDB) -ex 'set confirm off' -ex 'target remote :1234' -ex 'disp/i$$cs*16+(unsigned short)$$rip' -ex 'disp/8bx$$cs*16+(unsigned short)$$rip' -ex 'disp/x$$rax' -ex 'disp/x$$rbx' -ex 'disp/x$$cs' -ex 'disp/x$$rip' -ex 'file src/kernel64/kernel64.elf' -ex 'b kernel_main'
+	$(GDB) -ex 'set confirm off' -ex 'target remote :1234' -ex 'disp/i$$cs*16+(unsigned short)$$rip' -ex 'disp/8bx$$cs*16+(unsigned short)$$rip' -ex 'disp/x$$rax' -ex 'disp/x$$rbx' -ex 'disp/x$$cs' -ex 'disp/x$$rip' -ex 'b *0x7c00'
 
 db32:
 	$(MAKE) check32 T=1 &

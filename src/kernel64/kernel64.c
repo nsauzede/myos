@@ -6,7 +6,7 @@
 
 #include "tasks.h"
 
-unsigned char stack[0x100] asm("stack") = {
+unsigned char stack[0x4000] asm("stack") = {
 	[0] = 0xde,
 	[sizeof(stack) - 1] = 0xef
 };
