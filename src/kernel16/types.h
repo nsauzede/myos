@@ -5,6 +5,7 @@
 
 typedef unsigned long size_t;
 
+/*
 // model i/l/p
 
 // ILP16 2/4/2
@@ -15,6 +16,7 @@ typedef unsigned long size_t;
 //  LP64 4/8/8
 // ILP64 8/8/8
 // LLP64 4/4/8 (new type : long long)
+*/
 
 typedef unsigned long uint32_t;
 typedef unsigned short uint16_t;

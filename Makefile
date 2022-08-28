@@ -1,4 +1,4 @@
-TARGET:=fd.img romext.rom fd32.img romext32.rom fd64.img romext64.rom
+TARGET:=fd.img fd16.img romext16.rom fd32.img romext32.rom fd64.img romext64.rom
 
 QEMU:=qemu-system-i386 -cpu 486
 QEMU64:=qemu-system-x86_64
@@ -16,6 +16,13 @@ check:	fd.img
 	$(QEMU) $(QEMUOPTS) -drive format=raw,file=$<
 
 checkr:	romext.rom
+	$(QEMU) $(QEMUOPTS) -option-rom $<
+
+check16:	fd16.img
+#	$(QEMU) $(QEMUOPTS) -fda $< -boot a
+	$(QEMU) $(QEMUOPTS) -drive format=raw,file=$<
+
+check16r:	romext16.rom
 	$(QEMU) $(QEMUOPTS) -option-rom $<
 
 check32:	fd32.img

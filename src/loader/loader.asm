@@ -177,7 +177,7 @@ jc error
 call dots
 mov al,[KERNEL_OFS]
 cmp al,0x1
-jbe .stop
+jb .stop
 mov ah,0x02
 inc al
 int 0x13					; clobbers CF,ax

@@ -17,7 +17,7 @@ dw LOAD_OFS
 kernel_main:
 jmp _kernel_entry
 
-sgreet db `hello kernel16 - kernel_main=[%p]\r\n`,0
+sgreet db `hello kernel (16-bit) - kernel_main=[%p]\r\n`,0
 
 ; multiboot header
 magic dd 0x1badb002

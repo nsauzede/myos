@@ -1,8 +1,7 @@
 #include <stdarg.h>
 
 #include "libc.h"
-
-#include "vid.h"
+#include "vid.h"        // dputchar
 
 void *mmemset( void *_s, int c, size_t n)
 {

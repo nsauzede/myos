@@ -45,7 +45,7 @@ void cls()
 int dputchar( c)
 int c;
 {
-	unsigned char *ptr = (void *)0xB8000;
+	unsigned char *ptr = (void *)0xB800;
 	
 	int skip = 0;
 	
@@ -74,7 +74,7 @@ int c;
 void dputs( s)
 char *s;
 {
-    unsigned char *ptr = (void *)0xB8000;
+    unsigned char *ptr = (void *)0xB800;
     
     if (s)
     while (*s)
