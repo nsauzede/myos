@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#if 1
+#if 0
 void outb( /*uint8_t*/ value, /*uint16_t*/ port);
 uint8_t inb( /*uint_16_t*/ port);
 #else
