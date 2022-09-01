@@ -7,26 +7,37 @@
 
 #pragma pack(1)
 typedef struct idtr {
-	uint16_t limit;
-	uint64_t base_addr;
+    uint16_t limit;
+#ifdef _LP64
+    uint64_t base_addr;
+#else
+    uint32_t base_addr;
+#endif
 } idtr_t;
 #pragma pack()
 
 #pragma pack(1)
 typedef struct idte {
-	uint16_t offset_low;
-	uint16_t seg_sel;
+    uint16_t offset_low;
+    uint16_t seg_sel;
 
-	uint8_t ist:3;
-	uint8_t reserved:5;
-	uint8_t type:3;
-	uint8_t op_size:1;
-	uint8_t zero:1;
-	uint8_t dpl:2;
-	uint8_t present:1;
-	uint16_t offset_higha;
-	uint32_t offset_highb;
-	uint32_t rsvd;
+#ifdef _LP64
+    uint8_t ist:3;
+    uint8_t reserved:5;
+#else
+    uint8_t reserved:5;
+    uint8_t flags:3;
+#endif
+    uint8_t type:3;
+    uint8_t op_size:1;
+    uint8_t zero:1;
+    uint8_t dpl:2;
+    uint8_t present:1;
+    uint16_t offset_high;
+#ifdef _LP64
+    uint32_t offset_highbis;
+    uint32_t rsvd;
+#endif
 } idte_t;
 #pragma pack()
 
@@ -46,7 +57,7 @@ void halt()
 // FIXME : implement flags backup
 void disable()
 {
-	asm volatile( "cli");	
+	asm volatile( "cli");
 }
 
 void enable()
@@ -79,27 +90,27 @@ void idt_setup()
 	);
 }
 
-void idt_set_handler( int num, idt_handler_t handler)
-{
-	idte_t *idte = &idt[num];
-	if (!handler)
-	{
-		idte->offset_low = 0;
-		idte->offset_higha = 0;
-		idte->offset_highb = 0;
-		idte->dpl = 0;
-		idte->present = 0;
-		idte->rsvd = 0;
-	}
-	else
-	{
-		idte->offset_low = (typeof(idte->offset_low))((uintptr_t)handler & 0xFFFF);
-		idte->offset_higha = (typeof(idte->offset_higha))(((uintptr_t)handler >> 16) & 0xFFFF);
-		idte->offset_highb = (typeof(idte->offset_highb))(((uintptr_t)handler >> 32) & 0xFFFFFFFF);
-		idte->dpl = 0;
-		idte->present = 1;
-		idte->rsvd = 0;
-	}
+void idt_set_handler( int num, idt_handler_t handler) {
+    idte_t *idte = &idt[num];
+    if (!handler) {
+        idte->offset_low = 0;
+        idte->offset_high = 0;
+        idte->dpl = 0;
+        idte->present = 0;
+#ifdef _LP64
+        idte->offset_highbis = 0;
+        idte->rsvd = 0;
+#endif
+    } else {
+        idte->offset_low = (typeof(idte->offset_low))((uintptr_t)handler & 0xFFFF);
+        idte->offset_high = (typeof(idte->offset_high))(((uintptr_t)handler >> 16) & 0xFFFF);
+        idte->dpl = 0;
+        idte->present = 1;
+#ifdef _LP64
+        idte->offset_highbis = (typeof(idte->offset_highbis))(((uintptr_t)handler >> 32) & 0xFFFFFFFF);
+        idte->rsvd = 0;
+#endif
+    }
 }
 
 void exception_setup()
