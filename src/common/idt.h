@@ -23,4 +23,8 @@ void irq_set_handler( int num, idt_handler_t);
 
 void i8254_set_freq( unsigned int freq);
 
+void halt();
+void enable();
+void disable();
+
 #endif

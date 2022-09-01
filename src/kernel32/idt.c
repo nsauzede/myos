@@ -36,7 +36,7 @@ extern void *def_int_wrappers[IDT_NUM] asm("def_int_wrappers");
 
 idt_handler_t idt_handlers[IDT_NUM] asm("idt_handlers");
 
-void hlt()
+void halt()
 {
 	asm volatile( "hlt");
 }
@@ -44,12 +44,12 @@ void hlt()
 // FIXME : implement flags backup
 void disable()
 {
-	asm volatile( "cli");	
+	asm volatile( "cli");
 }
 
 void enable()
 {
-//	asm volatile( "sti");
+	asm volatile( "sti");
 }
 
 void idt_setup()
@@ -106,7 +106,7 @@ void exception_set_handler( int num, idt_handler_t handler)
 	disable();
 	idt_handlers[num] = handler;
 	idt_set_handler( num, idt_wrappers[num]);
-	enable();
+//	enable();
 }
 
 #define MASTER 0x20
@@ -155,7 +155,7 @@ void irq_set_handler( int num, idt_handler_t handler)
 	idt_set_handler( IRQ_BASE + num, idt_wrappers[IRQ_BASE + num]);
 #endif
 	i8259_enable_line( num);
-	enable();
+//	enable();
 }
 
 #define MAX_FREQ 1193180

@@ -45,7 +45,7 @@ MODE:=-m32
 endif
 kernel64.elf:	CFLAGS+=$(MODE) -fno-stack-protector $(KCFLAGS)
 kernel64.elf:	LDFLAGS+=$(MODE) $(KLDFLAGS)
-kernel64.elf:	boot.o kernel64.o vid.o _vid.o vid.o libc.o tasks.o idt.o idt_wrappers.o
+kernel64.elf:	boot.o kernel.o vid.o _vid.o vid.o libc.o tasks.o idt.o idt_wrappers.o
 	$(CC) -o $@ $^ -static $(LDFLAGS) -e kernel_main
 
 kernel64.bin:	kernel64.elf

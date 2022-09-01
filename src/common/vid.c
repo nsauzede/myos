@@ -3,8 +3,6 @@
 #include "vid.h"
 #include "ioport.h"
 
-#define IODELAY() asm volatile( ".byte 0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90")
-
 static int col = 0;
 static int row = 0;
 static unsigned char attr = 0;

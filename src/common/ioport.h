@@ -14,3 +14,4 @@
 	_v;                                                           \
 	}) 
 
+#define IODELAY() asm volatile( ".byte 0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90")

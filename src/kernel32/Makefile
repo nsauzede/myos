@@ -39,7 +39,7 @@ libc.o:	$(LIBC)/libc.c
 
 kernel32.elf:	CFLAGS+=-m32 -fno-stack-protector $(KCFLAGS)
 kernel32.elf:	LDFLAGS+=-m32 $(KLDFLAGS)
-kernel32.elf:	boot.o kernel32.o vid.o _vid.o vid.o libc.o tasks.o idt.o idt_wrappers.o
+kernel32.elf:	boot.o kernel.o vid.o _vid.o vid.o libc.o tasks.o idt.o idt_wrappers.o
 	$(CC) -o $@ $^ -static $(LDFLAGS) -e kernel_main
 
 kernel32.bin:	kernel32.elf

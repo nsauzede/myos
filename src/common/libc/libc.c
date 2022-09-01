@@ -3,23 +3,37 @@
 #include "libc.h"
 #include "vid.h"        // dputchar
 
-void *mmemset( void *_s, int c, size_t n)
-{
-	void *s = _s;
-	
-	if (s)
-	{
-		while (n--)
-		{
-			*(unsigned char *)s++ = (unsigned char)c;
-		}
-	}
-	
-	return _s;
+void *mmemset( void *_s, int c, size_t n) {
+    void *s = _s;
+
+    if (s) {
+        while (n--) {
+            *(unsigned char *)s++ = (unsigned char)c;
+        }
+    }
+
+    return _s;
 }
 
-static char *hextostr( char *_s, void *ptr, int _len, int fixed)
-{
+static char *dectostr( char *_s, int size, void *ptr) {
+    int v = *(int *)ptr;
+    char *s = _s;
+    for (int v_ = v;;) {
+        s++;
+        v_ = v_ / 10;
+        if (!v_) break;
+    }
+    *s-- = 0;
+    for (;;) {
+        int d = v % 10;
+        *s-- = d + '0';
+        v = v / 10;
+        if (!v) break;
+    }
+    return _s;
+}
+
+static char *hextostr( char *_s, void *ptr, int _len, int fixed) {
 	int len = _len;
 	char *s = _s + len * 2;
 	if (s && ptr)
@@ -62,12 +76,12 @@ static char *hextostr( char *_s, void *ptr, int _len, int fixed)
 	return _s;
 }
 
-int mprintf( const char *fmt, ...)
-{
+int mprintf( const char *fmt, ...) {
 	char buf[20];
 	va_list ap;
 	void *ptr;
 	int chr;
+	int num;
 	
 	memset( buf, '?', sizeof( buf) - 1);
 	va_start( ap, fmt);
@@ -114,13 +128,11 @@ int mprintf( const char *fmt, ...)
 						ptr = va_arg( ap, typeof( ptr));
 						dputs( ptr);
 						break;
-#if 0
 					case 'd':
-						ptr = va_arg( ap, typeof( ptr));
-						dectostr( buf, &ptr, sizeof( ptr));
+						num = va_arg( ap, typeof(num));
+						dectostr( buf, sizeof(buf), &num);
 						dputs( buf);
 						break;
-#endif
 				}
 				break;
 			}

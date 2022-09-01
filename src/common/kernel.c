@@ -34,7 +34,7 @@ void int_handler( int id, uint32_t _ebp,
 	setcursor( 0, 0);
 	while (1)
 	{
-		asm volatile( "hlt");
+		halt();
 	}
 }
 
@@ -113,8 +113,8 @@ int scheduler()
 	{
 		static int count = 0;
 		gotoxy( 0, 3);
-		printf( "%s: having some hlt.. %x\n", __func__, count++);
-		asm volatile( "hlt");
+		printf( "%s: having some halt.. %x\n", __func__, count++);
+		halt();
 		schedule_tasks();
 	}
 	return 0;
@@ -126,7 +126,8 @@ void kernel_main()
 	console_init();		// this will initialize internal console data for subsequent printouts
 	
 	printf( "\n\n");	// leave first lines for interrupts
-	printf( "hello kernel32 - kernel_main=[%p]\n", kernel_main);
+	int bits = sizeof(void *) * 8;
+	printf( "hello kernel%d - kernel_main=[%p]\n", bits, kernel_main);
 	
 	idt_setup();		// init idt with default int handlers
 
@@ -138,13 +139,13 @@ void kernel_main()
 	irq_set_handler( IRQ_TIMER, timer_handler);
 	i8254_set_freq( 1);
 
-	asm volatile( "sti");	
+	enable();
 
-	scheduler();	// infinite loop, with hlt's
+	scheduler();	// infinite loop, with halt's
 	
-	printf( "*system32 halted*");
+	printf( "*system halted*");
 	while (1)
 	{
-		asm volatile( "hlt");
+		halt();
 	}
 }
