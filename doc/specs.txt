@@ -107,3 +107,16 @@ else we keep on getting triple fault !
 gdt:
 WARNING : it seems we must first ljmp to zeroize offset before lgdt;
 also be careful to set proper ds before lgdt
+
+QEMU send keys:
+ctrl-alt-delete =>
+1d 38 e0 53 e0 d3 b8 9d
+
+lctrl down 1d
+lctrl up 9d
+lalt down 38
+lalt up b8
+del down e0 53
+del up e0 d3
+ins down e0 52
+ins up e0 d2

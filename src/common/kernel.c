@@ -17,9 +17,6 @@ void int_handler( int id, uint32_t _ebp,
 	uint32_t code, uint32_t eip, uint32_t cs, uint32_t eflags
 	)
 {
-	extern void home() asm ("home");
-	extern void setattr() asm ("setattr");
-	extern void setcursor() asm ("setcursor");
 	home();
 	setattr( BG_BLACK | FG_RED);
 	printf( "int#%p: ", id);
