@@ -63,7 +63,7 @@ inf:
 	hlt
 	jmp inf
 
-#if 1
+#if 0
 .align 4
 #define MAGIC 0x1badb002
 #define FLAGS 0x00010003

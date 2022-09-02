@@ -137,8 +137,7 @@ inf:
 	hlt
 	jmp inf
 
-/*
-#if 1
+#if 0
 .align 4
 #define MAGIC 0x1badb002
 #define FLAGS 0x00010003
@@ -152,7 +151,6 @@ ldead: .long KERNEL_ADDR+_end
 bssea: .long 0x0
 entry: .long _kernel_entry
 #endif
-*/
 
 .quad 0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
