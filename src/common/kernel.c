@@ -57,25 +57,23 @@ void kb_handler( int id, uint32_t ebp)
 	kbhits++;
 }
 
-void div_handler( int id, uint32_t ebp)
-{
+void div_handler(int id, uint32_t ebp) {
 	divs++;
 }
 
-int t1( struct pt *pt, int tid, void *arg)
-{
-	int startl = (uintptr_t)arg;
-	PT_BEGIN( pt);
+PT_THREAD(t1(struct pt *pt, int tid, void *arg)) {
+	PT_BEGIN(pt);
+	static int startl = 0;
+	startl = (uintptr_t)arg;
 	
-	while (1)
-	{
+	while (1) {
 		static int count = 0;
 		static int div = 0;
 		
 		gotoxy( 0, startl + 0);
 		printf( "%s: looping.. #%08lx jif=%08lx kb=%p divs=%p div=%x", __func__, (void *)(uintptr_t)count++, jiffies, kbhits, divs, div);
 		gotoxy( 0, startl + 1);
-		int j;
+		static int j;
 		for (j = 0; j < KB_SIZE; j++)
 		{
 			printf( "%02x%c", kb_ring[j], j == kb_head ? '<' : ' ');
@@ -85,13 +83,12 @@ int t1( struct pt *pt, int tid, void *arg)
 	PT_END( pt);
 }
 
-int t2( struct pt *pt, int tid, void *arg)
-{
-	int startl = (uintptr_t)arg;
+PT_THREAD(t2(struct pt *pt, int tid, void *arg)) {
 	PT_BEGIN( pt);
+	static int startl = 0;
+	startl = (uintptr_t)arg;
 	
-	while (1)
-	{
+	while (1) {
 		static int count = 0;
 		
 		gotoxy( 0, startl + 0);
@@ -101,20 +98,48 @@ int t2( struct pt *pt, int tid, void *arg)
 	PT_END( pt);
 }
 
-int scheduler()
+PT_THREAD(tshell(struct pt *pt, int tid, void *arg))
+{
+    PT_BEGIN( pt);
+    static int startl;
+    startl = (uintptr_t)arg;
+    static int valid;
+    static unsigned char buf[128];
+    static char prompt[10];
+    prompt[0] = '>';
+    prompt[1] = ' ';
+    prompt[2] = 0;
+    memset(buf, ' ', sizeof(buf) - 2);
+    buf[sizeof(buf) - 1] = 0;
+    while (1) {
+        if (!valid && kbhits >= 10)
+            valid++;
+        gotoxy( 0, startl + 0);
+        if (valid) {
+            printf("%s: buf validated (valid=%d) [%s]\n", __func__, valid, buf);
+        } else {
+            //printf("%s: %s%s (valid=%d)", __func__, prompt, buf, valid);
+            printf("%s: (valid=%d) %s%s", __func__, valid, prompt, buf);
+//            printf("%s: (valid=%d)", __func__, valid);
+        }
+        PT_YIELD( pt);
+    }
+    PT_END( pt);
+}
+
+void scheduler()
 {
 	init_tasks();
-	create_task( t1, (void *)6);
-	create_task( t2, (void *)9);
-	while (1)
-	{
+	create_task(t1, (void *)6);
+	create_task(t2, (void *)9);
+	create_task(tshell, (void *)12);
+	while (1) {
 		static int count = 0;
 		gotoxy( 0, 3);
 		printf( "%s: having some halt.. %x\n", __func__, count++);
 		halt();
 		schedule_tasks();
 	}
-	return 0;
 }
 
 extern void kernel_main() asm("kernel_main");
@@ -122,27 +147,21 @@ void kernel_main()
 {
 	console_init();		// this will initialize internal console data for subsequent printouts
 	
-	printf( "\n\n");	// leave first lines for interrupts
+	printf("\n\n");	// leave first lines for interrupts
 	int bits = sizeof(void *) * 8;
-	printf( "hello kernel%d - kernel_main=[%p]\n", bits, kernel_main);
+	printf("hello kernel%d - kernel_main=[%p]\n", bits, kernel_main);
 	
 	idt_setup();		// init idt with default int handlers
 
-//	exception_set_handler( EXCEPTION_DIVIDE, div_handler);
-	exception_set_handler( EXCEPTION_DIVIDE, (idt_handler_t)int_handler);
+//	exception_set_handler(EXCEPTION_DIVIDE, div_handler);
+	exception_set_handler(EXCEPTION_DIVIDE, (idt_handler_t)int_handler);
 
 	irq_setup();
-	irq_set_handler( IRQ_KB, kb_handler);
-	irq_set_handler( IRQ_TIMER, timer_handler);
-	i8254_set_freq( 1);
+	irq_set_handler(IRQ_KB, kb_handler);
+	irq_set_handler(IRQ_TIMER, timer_handler);
+	i8254_set_freq(1);
 
 	enable();
 
 	scheduler();	// infinite loop, with halt's
-	
-	printf( "*system halted*");
-	while (1)
-	{
-		halt();
-	}
 }

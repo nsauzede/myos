@@ -16,8 +16,12 @@ void *mmemset( void *_s, int c, size_t n) {
 }
 
 static char *dectostr( char *_s, int size, void *ptr) {
-    int v = *(int *)ptr;
     char *s = _s;
+    int v = *(int *)ptr;
+    if (v < 0) {
+        *s++ = '-';
+        v = -v;
+    }
     for (int v_ = v;;) {
         s++;
         v_ = v_ / 10;

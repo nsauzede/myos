@@ -3,12 +3,12 @@
 
 #include "pt.h"
 
-typedef int (*pt_fun_t)(struct pt *pt, int tid, void *arg);
+typedef char (*pt_fun_t)(struct pt *pt, int tid, void *arg);
 
 int init_tasks();
-int create_task( pt_fun_t fun, void *arg);
-int run_task( int tid);
-int delete_task( int tid);
+int create_task(pt_fun_t fun, void *arg);
+int run_task(int tid);
+int delete_task(int tid);
 int schedule_tasks();
 
 #endif/*__TASKS_H__*/
