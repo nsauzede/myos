@@ -36,8 +36,10 @@ You should then see the first instructions of the 16-bit loader:
 Some parts inspired on SOS : (another educational operating system)
 http://sos.enix.org/
 
-This project was started to learn by myself how operating systems are
-written and work at their lowest level.
+Uses protothread from Contiki-NG OS project (see LICENSE_pt.md BSD-3-Clause license).
+
+This project was started in 2009 to learn by myself how operating systems are
+written and work at their lowest level, and is only sporadically updated.
 It is focused mainly on intel x86 architecture.
 
 KEYWORDS : os boot loaders, 16/32/64 bit assembly, real/protected/long mode,

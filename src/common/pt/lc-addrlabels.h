@@ -30,7 +30,6 @@
  *
  * Author: Adam Dunkels <adam@sics.se>
  *
- * $Id: lc-addrlabels.h,v 1.4 2006/06/03 11:29:43 adam Exp $
  */
 
 /**
@@ -53,33 +52,34 @@
  * For more information, see the GCC documentation:
  * http://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html
  *
+ * Thanks to dividuum for finding the nice local scope label
+ * implementation.
  */
 
-#ifndef __LC_ADDRLABELS_H__
-#define __LC_ADDRLABELS_H__
+#ifndef LC_ADDRLABELS_H_
+#define LC_ADDRLABELS_H_
 
 /** \hideinitializer */
 typedef void * lc_t;
 
 #define LC_INIT(s) s = NULL
 
-#define LC_RESUME(s)				\
-  do {						\
-    if(s != NULL) {				\
-      goto *s;					\
-    }						\
+
+#define LC_RESUME(s)                            \
+  do {                                          \
+    if(s != NULL) {                             \
+      goto *s;                                  \
+    }                                           \
   } while(0)
 
-#define LC_CONCAT2(s1, s2) s1##s2
-#define LC_CONCAT(s1, s2) LC_CONCAT2(s1, s2)
-
-#define LC_SET(s)				\
-  do {						\
-    LC_CONCAT(LC_LABEL, __LINE__):   	        \
-    (s) = &&LC_CONCAT(LC_LABEL, __LINE__);	\
+#define LC_SET(s)                               \
+  do {                                          \
+    __label__ resume;                           \
+  resume:                                       \
+    (s) = &&resume;                             \
   } while(0)
 
 #define LC_END(s)
 
-#endif /* __LC_ADDRLABELS_H__ */
+#endif /* LC_ADDRLABELS_H_ */
 /** @} */

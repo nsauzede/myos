@@ -26,11 +26,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
  * SUCH DAMAGE. 
  *
- * This file is part of the protothreads library.
+ * This file is part of the Contiki operating system.
  * 
  * Author: Adam Dunkels <adam@sics.se>
  *
- * $Id: pt-sem.h,v 1.2 2005/02/24 10:36:59 adam Exp $
  */
 
 /**
@@ -48,7 +47,7 @@
  * checks the semaphore counter and blocks the thread if the counter
  * is zero. The "signal" operation increases the semaphore counter but
  * does not block. If another thread has blocked waiting for the
- * semaphore that is signalled, the blocked thread will become
+ * semaphore that is signaled, the blocked thread will become
  * runnable again.
  *
  * Semaphores can be used to implement other, more structured,
@@ -151,20 +150,22 @@ PT_THREAD(driver_thread(struct pt *pt))
    
 /**
  * \file
- * Couting semaphores implemented on protothreads
+ * Counting semaphores implemented on protothreads
  * \author
  * Adam Dunkels <adam@sics.se>
  *
  */
 
-#ifndef __PT_SEM_H__
-#define __PT_SEM_H__
+#ifndef PT_SEM_H_
+#define PT_SEM_H_
 
 #include "pt.h"
 
 struct pt_sem {
-  unsigned int count;
+  unsigned int head, tail;
 };
+
+#define PT_SEM_COUNT(s) ((s)->head - (s)->tail)
 
 /**
  * Initialize a semaphore
@@ -180,7 +181,11 @@ struct pt_sem {
  * \param c (unsigned int) The initial count of the semaphore.
  * \hideinitializer
  */
-#define PT_SEM_INIT(s, c) (s)->count = c
+#define PT_SEM_INIT(s, c)			\
+  do {						\
+    (s)->tail = 0;				\
+    (s)->head = (c);				\
+  } while(0)
 
 /**
  * Wait for a semaphore
@@ -200,8 +205,8 @@ struct pt_sem {
  */
 #define PT_SEM_WAIT(pt, s)	\
   do {						\
-    PT_WAIT_UNTIL(pt, (s)->count > 0);		\
-    --(s)->count;				\
+    PT_WAIT_UNTIL(pt, PT_SEM_COUNT(s) > 0);	\
+    ++(s)->tail;				\
   } while(0)
 
 /**
@@ -219,9 +224,9 @@ struct pt_sem {
  *
  * \hideinitializer
  */
-#define PT_SEM_SIGNAL(pt, s) ++(s)->count
+#define PT_SEM_SIGNAL(pt, s) (++(s)->head)
 
-#endif /* __PT_SEM_H__ */
+#endif /* PT_SEM_H_ */
 
 /** @} */
 /** @} */

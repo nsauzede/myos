@@ -41,6 +41,7 @@ static void timer_handler(int id, uint32_t ebp) {
 #define KB_SIZE 20
 static unsigned char kb_ring[KB_SIZE];
 static int kb_head = 0;
+static int kb_tail = 0;
 static void kb_handler( int id, uint32_t ebp) {
     unsigned char byte;
     byte = inb(KB_PORT);
@@ -53,10 +54,35 @@ static void div_handler(int id, uint32_t ebp) {
     divs++;
 }
 
+PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
+    PT_BEGIN(pt);
+    static int startl = 0;
+    startl = 6 + 3 * tid;
+
+    while (1) {
+        static int count = 0;
+        static int len = 0;
+
+        gotoxy(0, startl + 0);
+        printf("%s: waiting keypresses.. kb=%p len=%d count=%d      ", __func__, kbhits, len, count);
+        PT_WAIT_UNTIL(pt, kb_head != kb_tail);
+        disable();
+        if (kb_head > kb_tail) {
+            len = kb_head - kb_tail;
+        } else {
+            len = kb_tail - kb_head;
+        }
+        kb_tail = kb_head;
+        count++;
+        enable();
+    }
+    PT_END(pt);
+}
+
 PT_THREAD(t1(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
     static int startl = 0;
-    startl = (uintptr_t)arg;
+    startl = 6 + 3 * tid;
 
     while (1) {
         static int count = 0;
@@ -67,7 +93,7 @@ PT_THREAD(t1(struct pt *pt, int tid, void *arg)) {
         gotoxy(0, startl + 1);
         static int j;
         for (j = 0; j < KB_SIZE; j++) {
-            printf("%02x%c", kb_ring[j], j == kb_head ? '<' : ' ');
+            printf("%c%02x%c", j == kb_head ? '>' : ' ', kb_ring[j], j == kb_head ? '<' : ' ');
         }
         PT_YIELD(pt);
     }
@@ -77,7 +103,7 @@ PT_THREAD(t1(struct pt *pt, int tid, void *arg)) {
 PT_THREAD(t2(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
     static int startl = 0;
-    startl = (uintptr_t)arg;
+    startl = 6 + 3 * tid;
 
     while (1) {
         static int count = 0;
@@ -93,7 +119,7 @@ PT_THREAD(tshell(struct pt *pt, int tid, void *arg))
 {
     PT_BEGIN(pt);
     static int startl;
-    startl = (uintptr_t)arg;
+    startl = 6 + 3 * tid;
     static int valid;
     static unsigned char buf[128];
     static char prompt[10];
@@ -118,11 +144,7 @@ PT_THREAD(tshell(struct pt *pt, int tid, void *arg))
     PT_END(pt);
 }
 
-static void scheduler() {
-    init_tasks();
-    create_task(t1, (void *)6);
-    create_task(t2, (void *)9);
-    create_task(tshell, (void *)12);
+static void schedule() {
     while (1) {
         static int count = 0;
         gotoxy(0, 3);
@@ -137,8 +159,7 @@ void kernel_main() {
     console_init();             // this will initialize internal console data for subsequent printouts
 
     printf("\n\n");             // leave first lines for interrupts
-    int bits = sizeof(void *) * 8;
-    printf("hello kernel%d - kernel_main=[%p]\n", bits, kernel_main);
+    printf("hello kernel%d - kernel_main=[%p]\n", sizeof(void *) * 8, kernel_main);
 
     idt_setup();                // init idt with default int handlers
 
@@ -152,5 +173,11 @@ void kernel_main() {
 
     enable();
 
-    scheduler();                // infinite loop, with halt's
+    init_tasks();
+    create_task(t1, 0);
+    create_task(t2, 0);
+    create_task(tkb, 0);
+    create_task(tshell, 0);
+
+    schedule();                // schedule tasks forever..
 }
