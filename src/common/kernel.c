@@ -108,8 +108,29 @@ PT_THREAD(tshello(struct pt *pt, int tid, void *arg)) {
     PT_END(pt);
 }
 
+typedef struct {
+    const char *name;
+    void (*fn)();
+} cmd_t;
+
+void sh_help();
+void sh_version();
+void sh_color();
+void sh_hello();
+
+static const cmd_t cmds[] = {
+    { "help", sh_help, },
+    { "version", sh_version, },
+    { "color", sh_color, },
+    { "hello", sh_hello, },
+};
+
 void sh_help() {
-    printf("Commands: help version color hello\n");
+    printf("Commands:");
+    for (int i = 0; i < sizeof(cmds) / sizeof(cmds[0]); i++) {
+        printf(" %s", cmds[i].name);
+    }
+    printf("\n");
 }
 
 void sh_version() {
@@ -127,27 +148,14 @@ void sh_hello() {
     create_task(tshello, 0);
 }
 
-typedef struct {
-    const char *name;
-    void (*fn)();
-} cmd_t;
-
 static void shell(char *s, int len) {
-    cls();
-//    printf("%s: s=[%s] len=%d\n", __func__, s, len);
-    if (!strncmp(s, "help", len)) {
-        sh_help();
-    } else if (!strncmp(s, "version", len)) {
-        sh_version();
-    } else if (!strncmp(s, "color", len)) {
-        sh_color();
-    } else if (!strncmp(s, "hello", len)) {
-        sh_hello();
-    } else {
-        //panic("invalid shell command");
-        printf("%s: invalid shell command [%s]\n", __func__, s);
-        printf("%s: try [help]\n", __func__);
+    for (int i = 0; i < sizeof(cmds) / sizeof(cmds[0]); i++) {
+        if (!strncmp(s, cmds[i].name, strlen(cmds[i].name))) {
+            return cmds[i].fn();
+        }
     }
+    printf("%s: invalid shell command [%s]\n", __func__, s);
+    printf("%s: try [help]\n", __func__);
 }
 
 PT_THREAD(tshell(struct pt *pt, int tid, void *arg)) {
@@ -175,6 +183,7 @@ PT_THREAD(tshell(struct pt *pt, int tid, void *arg)) {
             stdin_len = stdin_tail - stdin_head;
         }
         gotoxy(0, startl + 3);
+        cls();
         shell(stdin, stdin_len);
         stdin_tail = stdin_head;
     }
@@ -236,7 +245,6 @@ PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
                         }
                         else if (klen >= MAXK - 1)
                             ovf++;
-                            //panic("tkb overflow");
                         else if (k.ch != 0xff) {
                             kcodes[klen++] = k.ch;
                         }
