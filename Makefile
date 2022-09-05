@@ -1,4 +1,5 @@
-TARGET:=fd.img fd16.img romext16.rom fd32.img romext32.rom fd64.img romext64.rom
+TARGET:=fd.img romext.rom fd32.img romext32.rom fd64.img romext64.rom
+#TARGET+=fd16.img romext16.rom
 
 QEMU:=qemu-system-i386 -cpu 486
 QEMU64:=qemu-system-x86_64

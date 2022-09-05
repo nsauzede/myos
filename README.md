@@ -7,6 +7,7 @@ Copyright (C) Nicolas Sauzede 2009-2022.
 # How to test it
 Required tools: qemu-system-i386, nasm, gcc and make (and optionally gdb for debug)
 Note that "gcc-multilib" might also be needed to build 32-bit binaries.
+Note also that bcc is needed to build the C 16-bit kernel (experimental).
 
 Run the 16-bit kernel as a floppy boot sector:
 ```
