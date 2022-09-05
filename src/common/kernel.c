@@ -7,7 +7,7 @@
 
 #include "tasks.h"
 
-static char shell_version[] = "shell version 0.1";
+static char version[] = "0.1";
 
 unsigned char stack[0x4000] asm("stack") = {
     [0] = 0xde,
@@ -35,7 +35,6 @@ static void int_handler( int id, uint32_t _ebp,
     printf("gs=%x fs=%x es=%x ds=%x ss=%x ", gs, fs, es, ds, ss);
     printf("\n");
     printf("eax=%x ebx=%x ecx=%x edx=%x esi=%x edi=%x ebp=%x\n", eax, ebx, ecx, edx, esi, edi, ebp);
-    setcursor(0, 0);
     panic(__func__);
 }
 
@@ -72,121 +71,138 @@ typedef struct {
 } sc_t;
 
 #define SC(kc, ch) (sc_t){kc, ch}
-static sc_t sc_std[S_LAST - S_FIRST + 1];
+static sc_t sc1_std[S_LAST - S_FIRST + 1];
 
-// TODO: remove below kb_init once static sc_std initializer bytes is honored by the loader (??)
+// TODO: remove below kb_init once static sc1_std initializer bytes is honored by the loader (??)
 void kb_init() {
     int i = 0;
-    memset(sc_std, 0xff, sizeof(sc_std));
-    sc_std[i++] = SC(K_ESC, -1);
-    sc_std[i++] = SC(K_1, '1');
-    sc_std[i++] = SC(K_2, '2');
-    sc_std[i++] = SC(K_3, '3');
-    sc_std[i++] = SC(K_4, '4');
-    sc_std[i++] = SC(K_5, '5');
-    sc_std[i++] = SC(K_6, '6');
-    sc_std[i++] = SC(K_7, '7');
-    sc_std[i++] = SC(K_8, '8');
-    sc_std[i++] = SC(K_9, '9');
-    sc_std[i++] = SC(K_0, '0');
-    sc_std[i++] = SC(K_MINUS, '-');
-    sc_std[i++] = SC(K_EQUAL, '=');
-    sc_std[i++] = SC(K_BACKS, -1);
+    memset(sc1_std, 0xff, sizeof(sc1_std));
+    sc1_std[i++] = SC(K_ESC, -1);
+    sc1_std[i++] = SC(K_1, '1');
+    sc1_std[i++] = SC(K_2, '2');
+    sc1_std[i++] = SC(K_3, '3');
+    sc1_std[i++] = SC(K_4, '4');
+    sc1_std[i++] = SC(K_5, '5');
+    sc1_std[i++] = SC(K_6, '6');
+    sc1_std[i++] = SC(K_7, '7');
+    sc1_std[i++] = SC(K_8, '8');
+    sc1_std[i++] = SC(K_9, '9');
+    sc1_std[i++] = SC(K_0, '0');
+    sc1_std[i++] = SC(K_MINUS, '-');
+    sc1_std[i++] = SC(K_EQUAL, '=');
+    sc1_std[i++] = SC(K_BACKS, -1);
 
-    sc_std[i++] = SC(K_TAB, 'T');
-    sc_std[i++] = SC(K_Q, 'q');
-    sc_std[i++] = SC(K_W, 'w');
-    sc_std[i++] = SC(K_E, 'e');
-    sc_std[i++] = SC(K_R, 'r');
-    sc_std[i++] = SC(K_T, 't');
-    sc_std[i++] = SC(K_Y, 'y');
-    sc_std[i++] = SC(K_U, 'u');
-    sc_std[i++] = SC(K_I, 'i');
-    sc_std[i++] = SC(K_O, 'o');
-    sc_std[i++] = SC(K_P, 'p');
-    sc_std[i++] = SC(K_LBRAK, '[');
-    sc_std[i++] = SC(K_RBRAK, ']');
-    sc_std[i++] = SC(K_ENTER, '\n');
+    sc1_std[i++] = SC(K_TAB, '\t');
+    sc1_std[i++] = SC(K_Q, 'q');
+    sc1_std[i++] = SC(K_W, 'w');
+    sc1_std[i++] = SC(K_E, 'e');
+    sc1_std[i++] = SC(K_R, 'r');
+    sc1_std[i++] = SC(K_T, 't');
+    sc1_std[i++] = SC(K_Y, 'y');
+    sc1_std[i++] = SC(K_U, 'u');
+    sc1_std[i++] = SC(K_I, 'i');
+    sc1_std[i++] = SC(K_O, 'o');
+    sc1_std[i++] = SC(K_P, 'p');
+    sc1_std[i++] = SC(K_LBRAK, '[');
+    sc1_std[i++] = SC(K_RBRAK, ']');
+    sc1_std[i++] = SC(K_ENTER, '\n');
 
-    sc_std[i++] = SC(K_LCTRL, -1);
-    sc_std[i++] = SC(K_A, 'a');
-    sc_std[i++] = SC(K_S, 's');
-    sc_std[i++] = SC(K_D, 'd');
-    sc_std[i++] = SC(K_F, 'f');
-    sc_std[i++] = SC(K_G, 'g');
-    sc_std[i++] = SC(K_H, 'h');
-    sc_std[i++] = SC(K_J, 'j');
-    sc_std[i++] = SC(K_K, 'k');
-    sc_std[i++] = SC(K_L, 'l');
-    sc_std[i++] = SC(K_COL, ';');
-    sc_std[i++] = SC(K_QUOTE, '\'');
-    sc_std[i++] = SC(K_BTICK, '`');
+    sc1_std[i++] = SC(K_LCTRL, -1);
+    sc1_std[i++] = SC(K_A, 'a');
+    sc1_std[i++] = SC(K_S, 's');
+    sc1_std[i++] = SC(K_D, 'd');
+    sc1_std[i++] = SC(K_F, 'f');
+    sc1_std[i++] = SC(K_G, 'g');
+    sc1_std[i++] = SC(K_H, 'h');
+    sc1_std[i++] = SC(K_J, 'j');
+    sc1_std[i++] = SC(K_K, 'k');
+    sc1_std[i++] = SC(K_L, 'l');
+    sc1_std[i++] = SC(K_COL, ';');
+    sc1_std[i++] = SC(K_QUOTE, '\'');
+    sc1_std[i++] = SC(K_BTICK, '`');
 
-    sc_std[i++] = SC(K_LSHFT, -1);
-    sc_std[i++] = SC(K_BSLSH, '\\');
-    sc_std[i++] = SC(K_Z, 'z');
-    sc_std[i++] = SC(K_X, 'x');
-    sc_std[i++] = SC(K_C, 'c');
-    sc_std[i++] = SC(K_V, 'v');
-    sc_std[i++] = SC(K_B, 'b');
-    sc_std[i++] = SC(K_N, 'n');
-    sc_std[i++] = SC(K_M, 'm');
-    sc_std[i++] = SC(K_COMMA, ',');
-    sc_std[i++] = SC(K_DOT, '.');
-    sc_std[i++] = SC(K_SLASH, '/');
-    sc_std[i++] = SC(K_RSHFT, -1);
-    sc_std[i++] = SC(K_KPMUL, '*');
+    sc1_std[i++] = SC(K_LSHFT, -1);
+    sc1_std[i++] = SC(K_BSLSH, '\\');
+    sc1_std[i++] = SC(K_Z, 'z');
+    sc1_std[i++] = SC(K_X, 'x');
+    sc1_std[i++] = SC(K_C, 'c');
+    sc1_std[i++] = SC(K_V, 'v');
+    sc1_std[i++] = SC(K_B, 'b');
+    sc1_std[i++] = SC(K_N, 'n');
+    sc1_std[i++] = SC(K_M, 'm');
+    sc1_std[i++] = SC(K_COMMA, ',');
+    sc1_std[i++] = SC(K_DOT, '.');
+    sc1_std[i++] = SC(K_SLASH, '/');
+    sc1_std[i++] = SC(K_RSHFT, -1);
+    sc1_std[i++] = SC(K_KPMUL, '*');
 
-    sc_std[i++] = SC(K_ALT, -1);
-    sc_std[i++] = SC(K_SPACE, ' ');
-    sc_std[i++] = SC(K_CAPSL, ' ');
+    sc1_std[i++] = SC(K_ALT, -1);
+    sc1_std[i++] = SC(K_SPACE, ' ');
+    sc1_std[i++] = SC(K_CAPSL, -1);
 
-    sc_std[i++] = SC(K_F1, '1');
-    sc_std[i++] = SC(K_F2, '2');
-    sc_std[i++] = SC(K_F3, '3');
-    sc_std[i++] = SC(K_F4, '4');
-    sc_std[i++] = SC(K_F5, '5');
-    sc_std[i++] = SC(K_F6, '6');
-    sc_std[i++] = SC(K_F7, '7');
-    sc_std[i++] = SC(K_F8, '8');
-    sc_std[i++] = SC(K_F9, '9');
-    sc_std[i++] = SC(K_F10, 'a');
+    sc1_std[i++] = SC(K_F1, -1);
+    sc1_std[i++] = SC(K_F2, -1);
+    sc1_std[i++] = SC(K_F3, -1);
+    sc1_std[i++] = SC(K_F4, -1);
+    sc1_std[i++] = SC(K_F5, -1);
+    sc1_std[i++] = SC(K_F6, -1);
+    sc1_std[i++] = SC(K_F7, -1);
+    sc1_std[i++] = SC(K_F8, -1);
+    sc1_std[i++] = SC(K_F9, -1);
+    sc1_std[i++] = SC(K_F10, -1);
 
-    sc_std[i++] = SC(K_INS, -1);
-    sc_std[i++] = SC(K_HOME, -1);
-    sc_std[i++] = SC(K_PGUP, -1);
-    sc_std[i++] = SC(K_NUMLK, -1);
-    sc_std[i++] = SC(K_KPDIV, '/');
-    sc_std[i++] = SC(K_KPMUL, '*');
-    sc_std[i++] = SC(K_KPMIN, '-');
-//    sc_std[i++] = S_3;
+    sc1_std[i++] = SC(K_NUMLK, -1);
+    sc1_std[i++] = SC(K_SCRLK, -1);
+
+    sc1_std[i++] = SC(K_KP7, '7');
+    sc1_std[i++] = SC(K_KP8, '8');
+    sc1_std[i++] = SC(K_KP9, '9');
+    sc1_std[i++] = SC(K_KPMIN, '-');
+
+    sc1_std[i++] = SC(K_KP4, '4');
+    sc1_std[i++] = SC(K_KP4, '5');
+    sc1_std[i++] = SC(K_KP6, '6');
+    sc1_std[i++] = SC(K_KPPLU, '+');
+
+    sc1_std[i++] = SC(K_KP1, '1');
+    sc1_std[i++] = SC(K_KP2, '2');
+    sc1_std[i++] = SC(K_KP3, '3');
+    sc1_std[i++] = SC(K_KP0, '0');
+    sc1_std[i++] = SC(K_KPDOT, '.');
+
+    sc1_std[i++] = SC(0xfa, 'a');
+    sc1_std[i++] = SC(0xfb, 'b');
+    sc1_std[i++] = SC(K_BSLSH, '\\');
+
+    sc1_std[i++] = SC(K_F11, -1);
+    sc1_std[i++] = SC(K_F12, -1);
 };
 
 static int stdin_tail = 0;
 static int stdin_head = 0;
-#define STDIN_SIZE 1024
+#define STDIN_SIZE 40
 static char stdin_ring[STDIN_SIZE];
 static int klen = 0;
 #define MAXK 20
 static uint8_t kcodes[MAXK];
 static uint8_t kflags[256];       // 1: pressed 0: released/non-pressed
 
-void help() {
+void sh_help() {
     printf("help        Show this help\n");
-    printf("version     Show shell version\n");
+    printf("version     Show version\n");
 }
 
-void version() {
-    printf("%s\n", shell_version);
+void sh_version() {
+    printf("MyOS %s\n", version);
 }
 
 void shell(char *s, int len) {
     cls();
 //    printf("%s: s=[%s] len=%d\n", __func__, s, len);
     if (!strncmp(s, "help", len)) {
-        help();
+        sh_help();
     } else if (!strncmp(s, "version", len)) {
-        version();
+        sh_version();
     } else {
         //panic("invalid shell command");
         printf("%s: invalid shell command [%s]\n", __func__, s);
@@ -208,14 +224,21 @@ PT_THREAD(tshell(struct pt *pt, int tid, void *arg))
     while (1) {
         gotoxy(0, startl + 0);
         printf("%s: (stdin=%p len=%d tail=%d head=%d) [%s]\n", __func__, stdin, stdin_len, stdin_tail, stdin_head, stdin_ring);
-        PT_WAIT_UNTIL(pt, stdin_head != stdin_tail);
+        gotoxy(0, startl + 2);
+        printf("shell> %s ", kcodes);
+        static int klen_;
+        PT_WAIT_UNTIL(pt, klen_ != klen || stdin_head != stdin_tail);
+        if (klen_ != klen) {
+            klen_ = klen;
+            continue;
+        }
         stdin = &stdin_ring[stdin_tail];
         if (stdin_head > stdin_tail) {
             stdin_len = stdin_head - stdin_tail;
         } else {
             stdin_len = stdin_tail - stdin_head;
         }
-        gotoxy(0, startl + 1);
+        gotoxy(0, startl + 3);
         shell(stdin, stdin_len);
         stdin_tail = stdin_head;
     }
@@ -234,7 +257,7 @@ PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
 
         gotoxy(0, startl + 0);
         printf("%s: waiting keypresses.. kc=[%s] kb=%p klen=%d count=%d     \n", __func__, kcodes, kbhits, klen, count);
-        printf("%s: sc_std %x %x %x %x %x  kc=%x ch=%x ovf=%d  \n", __func__, sc_std[0], sc_std[1], sc_std[2], sc_std[3], sc_std[4], k.kc, k.ch, ovf);
+        printf("%s: kc=%x ch=%x ovf=%d  \n", __func__, k.kc, k.ch, ovf);
         PT_WAIT_UNTIL(pt, kb_head != kb_tail);
         disable();
         static int skip;
@@ -257,7 +280,7 @@ PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
                 } else if (sc == (0xe1 & ~0x80)) {
                     skip = 2;
                 } else if (sc >= S_FIRST && sc <= S_LAST) {
-                    k = sc_std[sc - S_FIRST];
+                    k = sc1_std[sc - S_FIRST];
                     if (k.kc == 0xff) panic("Invalid keycode");
                     kflags[(int)k.kc] = flags;
                     if (flags) {
@@ -267,13 +290,13 @@ PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
                             static int i;
                             for (i = 0; i < klen; i++) {
                                 stdin_ring[stdin_head % STDIN_SIZE] = kcodes[i];
+                                kcodes[i] = 0;
                                 stdin_head = (stdin_head + 1) % STDIN_SIZE;
                                 if (stdin_head == stdin_tail) {
                                     panic("stdin overflow");
                                 }
                             }
                             klen = 0;
-                            kcodes[0] = 0;
                         }
                         else if (klen >= MAXK - 1)
                             ovf++;
@@ -317,9 +340,8 @@ PT_THREAD(tints(struct pt *pt, int tid, void *arg)) {
 
 static void schedule() {
     while (1) {
-        static int count = 0;
-        gotoxy(0, 3);
-        printf("%s: having some halt.. %x\n", __func__, count++);
+        gotoxy(0, 2);             // leave first lines for interrupts
+        printf("Hello kernel%d - Copyright (C) Nicolas Sauzede 2009-2022.\n", sizeof(void *) * 8);
         halt();
         schedule_tasks();
     }
@@ -329,8 +351,6 @@ void kernel_main() asm("kernel_main");
 void kernel_main() {
     console_init();             // this will initialize internal console data for subsequent printouts
 
-    printf("\n\n");             // leave first lines for interrupts
-    printf("hello kernel%d - kernel_main=[%p]\n", sizeof(void *) * 8, kernel_main);
 
     idt_setup();                // init idt with default int handlers
 
@@ -342,11 +362,12 @@ void kernel_main() {
     irq_set_handler(IRQ_TIMER, timer_handler);
     i8254_set_freq(1);
 
+    setcursor(0, 0);
     enable();
 
     init_tasks();
-    create_task(tints, 0);
-    create_task(tkb, 0);
+    create_task(tints, 0);      // dummy task to show jiffies, keypresses etc..
+    create_task(tkb, 0);        // mandatory task to process kb buffer
     create_task(tshell, 0);
 
     schedule();                // schedule tasks forever..

@@ -67,8 +67,13 @@ row 6: lctrl lwin alt space altgr rwin menu rctrl left down right kp0 kpdot     
 #define K_F7    K(0,7)
 #define K_F8    K(0,8)
 #define K_F9    K(0,9)
-#define K_F10    K(0,10)
-//...
+#define K_F10   K(0,10)
+#define K_F11   K(0,11)
+#define K_F12   K(0,12)
+#define K_PRSCR K(0,13)
+#define K_SCRLK K(0,14)
+#define K_PAUSE K(0,15)
+
 #define K_BTICK K(1,0)
 #define K_1     K(1,1)
 #define K_2     K(1,2)
@@ -90,7 +95,7 @@ row 6: lctrl lwin alt space altgr rwin menu rctrl left down right kp0 kpdot     
 #define K_KPDIV K(1,18)
 #define K_KPMUL K(1,19)
 #define K_KPMIN K(1,20)
-//...
+
 #define K_TAB   K(2,0)
 #define K_Q     K(2,1)
 #define K_W     K(2,2)
@@ -105,7 +110,14 @@ row 6: lctrl lwin alt space altgr rwin menu rctrl left down right kp0 kpdot     
 #define K_LBRAK K(2,11)
 #define K_RBRAK K(2,12)
 #define K_ENTER K(2,13)
-//...
+#define K_DELET K(2,14)
+#define K_END   K(2,15)
+#define K_PGDN  K(2,16)
+#define K_KP7   K(2,17)
+#define K_KP8   K(2,18)
+#define K_KP9   K(2,19)
+#define K_KPPLU K(2,20)
+
 #define K_CAPSL K(3,0)
 #define K_A     K(3,1)
 #define K_S     K(3,2)
@@ -119,7 +131,10 @@ row 6: lctrl lwin alt space altgr rwin menu rctrl left down right kp0 kpdot     
 #define K_COL   K(3,10)
 #define K_QUOTE K(3,11)
 #define K_BSLSH K(3,12)
-//...
+#define K_KP4   K(3,13)
+#define K_KP5   K(3,14)
+#define K_KP6   K(3,15)
+
 #define K_LSHFT K(4,0)
 #define K_INF   K(4,1)
 #define K_Z     K(4,2)
@@ -133,11 +148,25 @@ row 6: lctrl lwin alt space altgr rwin menu rctrl left down right kp0 kpdot     
 #define K_DOT   K(4,10)
 #define K_SLASH K(4,11)
 #define K_RSHFT K(4,12)
-//...
+#define K_UP    K(4,13)
+#define K_KP1   K(4,14)
+#define K_KP2   K(4,15)
+#define K_KP3   K(4,16)
+#define K_KPENT K(4,17)
+
 #define K_LCTRL K(5,0)
 #define K_LWIN  K(5,1)
 #define K_ALT   K(5,2)
 #define K_SPACE K(5,3)
+#define K_ALTGR K(5,3)
+#define K_RWIN  K(5,3)
+#define K_MENU  K(5,3)
+#define K_RCTRL K(5,3)
+#define K_LEFT  K(5,3)
+#define K_DOWN  K(5,3)
+#define K_RIGHT K(5,3)
+#define K_KP0   K(5,3)
+#define K_KPDOT K(5,3)
 //...
 
 #endif/*KB_H_*/
