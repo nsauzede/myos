@@ -15,6 +15,16 @@ void *mmemset( void *_s, int c, size_t n) {
     return _s;
 }
 
+int mstrncmp(const char *s1, const char *s2, size_t n) {
+    for (int i = 0; i < n; i++) {
+        if (s1[i] > s2[i])
+            return 1;
+        if (s1[i] < s2[i])
+            return -1;
+    }
+    return 0;
+}
+
 static char *dectostr( char *_s, int size, void *ptr) {
     char *s = _s;
     int v = *(int *)ptr;
