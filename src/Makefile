@@ -6,8 +6,8 @@ endif
 
 all:	$(TARGET)
 
-KERNEL=kernel.bin
-KERNEL16=kernel16.bin
+KERNEL=kernel16.bin
+KERNEL16C=kernel16c.bin
 
 loader.sec:
 	$(MAKE) -C loader $@ P=`pwd`
@@ -15,23 +15,23 @@ loader.sec:
 loader.rom:
 	$(MAKE) -C loader $@ P=`pwd`
 
-fd.img:	loader.sec $(KERNEL)
+fd16.img:	loader.sec $(KERNEL)
 	cat $^ > $(P)/$@
 
-romext.bin:	loader.rom $(KERNEL)
-	cat $^ > $@
-
-romext.rom:	mkrom.exe romext.bin
-	./mkrom.exe romext.bin $(P)/$@
-
-fd16.img:	loader.sec $(KERNEL16)
-	cat $^ > $(P)/$@
-
-romext16.bin:	loader.rom $(KERNEL16)
+romext16.bin:	loader.rom $(KERNEL)
 	cat $^ > $@
 
 romext16.rom:	mkrom.exe romext16.bin
 	./mkrom.exe romext16.bin $(P)/$@
+
+fd16c.img:	loader.sec $(KERNEL16C)
+	cat $^ > $(P)/$@
+
+romext16c.bin:	loader.rom $(KERNEL16C)
+	cat $^ > $@
+
+romext16c.rom:	mkrom.exe romext16c.bin
+	./mkrom.exe romext16c.bin $(P)/$@
 
 fd32.img:	loader.sec kernel32.bin
 	cat $^ > $(P)/$@
@@ -52,10 +52,10 @@ romext64.rom:	mkrom.exe romext64.bin
 	./mkrom.exe romext64.bin $(P)/$@
 
 $(KERNEL):
-	$(MAKE) -C kernel $@ P=`pwd`
-
-$(KERNEL16):
 	$(MAKE) -C kernel16 $@ P=`pwd`
+
+$(KERNEL16C):
+	$(MAKE) -C kernel16c $@ P=`pwd`
 
 kernel32.bin:
 	$(MAKE) -C kernel32 $@ P=`pwd`
@@ -70,8 +70,8 @@ clean:
 	$(RM) $(TARGET) *.img *.sec *.bin *.rom
 	$(MAKE) -C tools $@
 	$(MAKE) -C loader $@
-	$(MAKE) -C kernel $@
 	$(MAKE) -C kernel16 $@
+	$(MAKE) -C kernel16c $@
 	$(MAKE) -C kernel32 $@
 	$(MAKE) -C kernel64 $@
 
@@ -79,7 +79,7 @@ clobber: clean
 	$(RM) *~
 	$(MAKE) -C tools $@
 	$(MAKE) -C loader $@
-	$(MAKE) -C kernel $@
 	$(MAKE) -C kernel16 $@
+	$(MAKE) -C kernel16c $@
 	$(MAKE) -C kernel32 $@
 	$(MAKE) -C kernel64 $@

@@ -11,14 +11,14 @@ Note also that bcc is needed to build the C 16-bit kernel (experimental).
 
 Run the 16-bit kernel as a floppy boot sector:
 ```
-$ make check
+$ make check16
 ```
 You should see this after typing 'abcd' (0x1e, 0x30, 0x2e, 0x20) on the keyboard:
 ![kernel16 screenshot](debug/kernel16.png)
 
 Debug the 16-bit boot part nicely in real-mode:
 ```shell
-$ make check_dbg
+$ make check16_dbg
 ...
 real-mode-gdb$ tb *0x7c00
 Temporary breakpoint 1 at 0x7c00
@@ -31,6 +31,13 @@ You should then see the first instructions of the 16-bit loader:
    0x7c01:      push   cs
    0x7c02:      pop    ds
 ```
+
+# Plan
+- [x] Add 64-bits support
+- [ ] Fix static variables initialization
+- [ ] Fix multiboot support (test in grub)
+- [ ] Rewrite common video routines in C
+- [ ] Fix 16-bits C support
 
 # About the project
 

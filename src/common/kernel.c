@@ -14,11 +14,16 @@ unsigned char stack[0x4000] asm("stack") = {
     [sizeof(stack) - 1] = 0xef
 };
 
-void panic(const char *s) {
+void panic(const char *fmt, ...) {
+    static char buf[80];
     disable();
     home();
-    setattr(BG_BLACK | FG_RED);
-    puts(s);
+    setattr(BG_FG(BLACK, LRED));
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, ap);
+    va_end(ap);
+    puts(buf);
     while (1) {
         halt();
     }
@@ -71,111 +76,14 @@ typedef struct {
 } sc_t;
 
 #define SC(kc, ch) (sc_t){kc, ch}
-static sc_t sc1_std[S_LAST - S_FIRST + 1];
-
-// TODO: remove below kb_init once static sc1_std initializer bytes is honored by the loader (??)
-void kb_init() {
-    int i = 0;
-    memset(sc1_std, 0xff, sizeof(sc1_std));
-    sc1_std[i++] = SC(K_ESC, -1);
-    sc1_std[i++] = SC(K_1, '1');
-    sc1_std[i++] = SC(K_2, '2');
-    sc1_std[i++] = SC(K_3, '3');
-    sc1_std[i++] = SC(K_4, '4');
-    sc1_std[i++] = SC(K_5, '5');
-    sc1_std[i++] = SC(K_6, '6');
-    sc1_std[i++] = SC(K_7, '7');
-    sc1_std[i++] = SC(K_8, '8');
-    sc1_std[i++] = SC(K_9, '9');
-    sc1_std[i++] = SC(K_0, '0');
-    sc1_std[i++] = SC(K_MINUS, '-');
-    sc1_std[i++] = SC(K_EQUAL, '=');
-    sc1_std[i++] = SC(K_BACKS, -1);
-
-    sc1_std[i++] = SC(K_TAB, '\t');
-    sc1_std[i++] = SC(K_Q, 'q');
-    sc1_std[i++] = SC(K_W, 'w');
-    sc1_std[i++] = SC(K_E, 'e');
-    sc1_std[i++] = SC(K_R, 'r');
-    sc1_std[i++] = SC(K_T, 't');
-    sc1_std[i++] = SC(K_Y, 'y');
-    sc1_std[i++] = SC(K_U, 'u');
-    sc1_std[i++] = SC(K_I, 'i');
-    sc1_std[i++] = SC(K_O, 'o');
-    sc1_std[i++] = SC(K_P, 'p');
-    sc1_std[i++] = SC(K_LBRAK, '[');
-    sc1_std[i++] = SC(K_RBRAK, ']');
-    sc1_std[i++] = SC(K_ENTER, '\n');
-
-    sc1_std[i++] = SC(K_LCTRL, -1);
-    sc1_std[i++] = SC(K_A, 'a');
-    sc1_std[i++] = SC(K_S, 's');
-    sc1_std[i++] = SC(K_D, 'd');
-    sc1_std[i++] = SC(K_F, 'f');
-    sc1_std[i++] = SC(K_G, 'g');
-    sc1_std[i++] = SC(K_H, 'h');
-    sc1_std[i++] = SC(K_J, 'j');
-    sc1_std[i++] = SC(K_K, 'k');
-    sc1_std[i++] = SC(K_L, 'l');
-    sc1_std[i++] = SC(K_COL, ';');
-    sc1_std[i++] = SC(K_QUOTE, '\'');
-    sc1_std[i++] = SC(K_BTICK, '`');
-
-    sc1_std[i++] = SC(K_LSHFT, -1);
-    sc1_std[i++] = SC(K_BSLSH, '\\');
-    sc1_std[i++] = SC(K_Z, 'z');
-    sc1_std[i++] = SC(K_X, 'x');
-    sc1_std[i++] = SC(K_C, 'c');
-    sc1_std[i++] = SC(K_V, 'v');
-    sc1_std[i++] = SC(K_B, 'b');
-    sc1_std[i++] = SC(K_N, 'n');
-    sc1_std[i++] = SC(K_M, 'm');
-    sc1_std[i++] = SC(K_COMMA, ',');
-    sc1_std[i++] = SC(K_DOT, '.');
-    sc1_std[i++] = SC(K_SLASH, '/');
-    sc1_std[i++] = SC(K_RSHFT, -1);
-    sc1_std[i++] = SC(K_KPMUL, '*');
-
-    sc1_std[i++] = SC(K_ALT, -1);
-    sc1_std[i++] = SC(K_SPACE, ' ');
-    sc1_std[i++] = SC(K_CAPSL, -1);
-
-    sc1_std[i++] = SC(K_F1, -1);
-    sc1_std[i++] = SC(K_F2, -1);
-    sc1_std[i++] = SC(K_F3, -1);
-    sc1_std[i++] = SC(K_F4, -1);
-    sc1_std[i++] = SC(K_F5, -1);
-    sc1_std[i++] = SC(K_F6, -1);
-    sc1_std[i++] = SC(K_F7, -1);
-    sc1_std[i++] = SC(K_F8, -1);
-    sc1_std[i++] = SC(K_F9, -1);
-    sc1_std[i++] = SC(K_F10, -1);
-
-    sc1_std[i++] = SC(K_NUMLK, -1);
-    sc1_std[i++] = SC(K_SCRLK, -1);
-
-    sc1_std[i++] = SC(K_KP7, '7');
-    sc1_std[i++] = SC(K_KP8, '8');
-    sc1_std[i++] = SC(K_KP9, '9');
-    sc1_std[i++] = SC(K_KPMIN, '-');
-
-    sc1_std[i++] = SC(K_KP4, '4');
-    sc1_std[i++] = SC(K_KP4, '5');
-    sc1_std[i++] = SC(K_KP6, '6');
-    sc1_std[i++] = SC(K_KPPLU, '+');
-
-    sc1_std[i++] = SC(K_KP1, '1');
-    sc1_std[i++] = SC(K_KP2, '2');
-    sc1_std[i++] = SC(K_KP3, '3');
-    sc1_std[i++] = SC(K_KP0, '0');
-    sc1_std[i++] = SC(K_KPDOT, '.');
-
-    sc1_std[i++] = SC(0xfa, 'a');
-    sc1_std[i++] = SC(0xfb, 'b');
-    sc1_std[i++] = SC(K_BSLSH, '\\');
-
-    sc1_std[i++] = SC(K_F11, -1);
-    sc1_std[i++] = SC(K_F12, -1);
+static const sc_t sc1_std[S_LAST - S_FIRST + 1] = {
+SC(K_ESC,-1),SC(K_1, '1'),SC(K_2, '2'),SC(K_3, '3'),SC(K_4, '4'),SC(K_5, '5'),SC(K_6, '6'),SC(K_7, '7'),SC(K_8, '8'),SC(K_9, '9'),SC(K_0, '0'),SC(K_MINUS, '-'),SC(K_EQUAL, '='),SC(K_BACKS, -1),
+SC(K_TAB, '\t'),SC(K_Q, 'q'),SC(K_W, 'w'),SC(K_E, 'e'),SC(K_R, 'r'),SC(K_T, 't'),SC(K_Y, 'y'),SC(K_U, 'u'),SC(K_I, 'i'),SC(K_O, 'o'),SC(K_P, 'p'),SC(K_LBRAK, '['),SC(K_RBRAK, ']'),SC(K_ENTER, '\n'),
+SC(K_LCTRL, -1),SC(K_A, 'a'),SC(K_S, 's'),SC(K_D, 'd'),SC(K_F, 'f'),SC(K_G, 'g'),SC(K_H, 'h'),SC(K_J, 'j'),SC(K_K, 'k'),SC(K_L, 'l'),SC(K_COL, ';'),SC(K_QUOTE, '\''),SC(K_BTICK, '`'),
+SC(K_LSHFT, -1),SC(K_BSLSH, '\\'),SC(K_Z, 'z'),SC(K_X, 'x'),SC(K_C, 'c'),SC(K_V, 'v'),SC(K_B, 'b'),SC(K_N, 'n'),SC(K_M, 'm'),SC(K_COMMA, ','),SC(K_DOT, '.'),SC(K_SLASH, '/'),SC(K_RSHFT, -1),SC(K_KPMUL, '*'),
+SC(K_ALT, -1),SC(K_SPACE, ' '),SC(K_CAPSL, -1),SC(K_F1, -1),SC(K_F2, -1),SC(K_F3, -1),SC(K_F4, -1),SC(K_F5, -1),SC(K_F6, -1),SC(K_F7, -1),SC(K_F8, -1),SC(K_F9, -1),SC(K_F10, -1),
+SC(K_NUMLK, -1),SC(K_SCRLK, -1),SC(K_KP7, '7'),SC(K_KP8, '8'),SC(K_KP9, '9'),SC(K_KPMIN, '-'),SC(K_KP4, '4'),SC(K_KP4, '5'),SC(K_KP6, '6'),SC(K_KPPLU, '+'),SC(K_KP1, '1'),SC(K_KP2, '2'),SC(K_KP3, '3'),SC(K_KP0, '0'),SC(K_KPDOT, '.'),
+SC(0xfa, 'a'),SC(0xfb, 'b'),SC(K_BSLSH, '\\'),SC(K_F11, -1),SC(K_F12, -1),
 };
 
 static int stdin_tail = 0;
@@ -187,22 +95,54 @@ static int klen = 0;
 static uint8_t kcodes[MAXK];
 static uint8_t kflags[256];       // 1: pressed 0: released/non-pressed
 
+int tid_start(int tid) {
+    return 4 + 3 * tid;
+}
+
+PT_THREAD(tshello(struct pt *pt, int tid, void *arg)) {
+    PT_BEGIN(pt);
+    static int startl;
+    startl = tid_start(tid);
+    gotoxy(0, startl + 0);
+    printf("%s: Hello World!\n", __func__);
+    PT_END(pt);
+}
+
 void sh_help() {
-    printf("help        Show this help\n");
-    printf("version     Show version\n");
+    printf("Commands: help version color hello\n");
 }
 
 void sh_version() {
     printf("MyOS %s\n", version);
 }
 
-void shell(char *s, int len) {
+static const int colors[] = {GREEN, BROWN, WHITE, LRED};
+void sh_color() {
+    static int color = 0;
+    color = (color + 1) % (sizeof(colors) / sizeof(colors[0]));
+    setattr(BG_FG(BLACK, colors[color]));
+}
+
+void sh_hello() {
+    create_task(tshello, 0);
+}
+
+typedef struct {
+    const char *name;
+    void (*fn)();
+} cmd_t;
+
+static void shell(char *s, int len) {
     cls();
 //    printf("%s: s=[%s] len=%d\n", __func__, s, len);
     if (!strncmp(s, "help", len)) {
         sh_help();
     } else if (!strncmp(s, "version", len)) {
         sh_version();
+    } else if (!strncmp(s, "color", len)) {
+        sh_color();
+    } else if (!strncmp(s, "hello", len)) {
+        sh_hello();
     } else {
         //panic("invalid shell command");
         printf("%s: invalid shell command [%s]\n", __func__, s);
@@ -210,12 +150,7 @@ void shell(char *s, int len) {
     }
 }
 
-int tid_start(int tid) {
-    return 4 + 3 * tid;
-}
-
-PT_THREAD(tshell(struct pt *pt, int tid, void *arg))
-{
+PT_THREAD(tshell(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
     static int startl;
     startl = tid_start(tid);
@@ -224,8 +159,9 @@ PT_THREAD(tshell(struct pt *pt, int tid, void *arg))
     while (1) {
         gotoxy(0, startl + 0);
         printf("%s: (stdin=%p len=%d tail=%d head=%d) [%s]\n", __func__, stdin, stdin_len, stdin_tail, stdin_head, stdin_ring);
-        gotoxy(0, startl + 2);
-        printf("shell> %s ", kcodes);
+        printf("---------------------------\n");
+        printf("cmd> %s ", kcodes);
+        setcursor(5 + strlen((char *)kcodes), startl + 2);
         static int klen_;
         PT_WAIT_UNTIL(pt, klen_ != klen || stdin_head != stdin_tail);
         if (klen_ != klen) {
@@ -249,7 +185,7 @@ PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
     static int startl = 0;
     startl = tid_start(tid);
-    kb_init();
+//    kb_init();
     while (1) {
         static int count = 0;
         static int ovf = 0;
@@ -317,18 +253,15 @@ PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
     PT_END(pt);
 }
 
-PT_THREAD(tints(struct pt *pt, int tid, void *arg)) {
+PT_THREAD(tsys(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
     static int startl = 0;
     startl = tid_start(tid);
 
     while (1) {
         static int count = 0;
-        static int div = 0;
-
         gotoxy(0, startl + 0);
-        printf("%s: looping.. #%08lx jif=%08lx kb=%p divs=%p div=%x", __func__, (void *)(uintptr_t)count++, jiffies, kbhits, divs, div);
-        gotoxy(0, startl + 1);
+        printf("%s: #%d jif=%d kb=%p ntsk=%d divs=%p \n", __func__, count++, jiffies, kbhits, ntasks, divs);
         static int j;
         for (j = 0; j < KB_SIZE; j++) {
             printf("%c%02x%c", j == kb_head ? '>' : ' ', kb_ring[j], j == kb_head ? '<' : ' ');
@@ -351,7 +284,6 @@ void kernel_main() asm("kernel_main");
 void kernel_main() {
     console_init();             // this will initialize internal console data for subsequent printouts
 
-
     idt_setup();                // init idt with default int handlers
 
     exception_set_handler(EXCEPTION_DIVIDE, div_handler);
@@ -362,11 +294,11 @@ void kernel_main() {
     irq_set_handler(IRQ_TIMER, timer_handler);
     i8254_set_freq(1);
 
-    setcursor(0, 0);
+//    setcursor(5, 2);
     enable();
 
     init_tasks();
-    create_task(tints, 0);      // dummy task to show jiffies, keypresses etc..
+    create_task(tsys, 0);      // dummy task to show jiffies, keypresses etc..
     create_task(tkb, 0);        // mandatory task to process kb buffer
     create_task(tshell, 0);
 

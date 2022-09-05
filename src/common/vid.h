@@ -22,13 +22,18 @@ d pink light
 e yellow
 f white
 */
-#define BLACK 0
-#define RED 0xC
+#define BLACK 0x0
 #define GREEN 0x2
-#define BG_BLACK (BLACK << 4)
-#define FG_RED (RED)
-#define FG_GREEN (GREEN)
-#define DEFAULT_ATTR    (BG_BLACK | FG_GREEN)
+#define BROWN 0x6
+#define LRED 0xc
+#define WHITE 0xf
+
+#define BG_FG(bg, fg) ((bg << 4) | (fg))
+
+#define DEFAULT_BG BLACK
+#define DEFAULT_FG GREEN
+
+#define DEFAULT_ATTR    BG_FG(DEFAULT_BG, DEFAULT_FG)
 
 void home();
 void gotoxy( int x, int y);

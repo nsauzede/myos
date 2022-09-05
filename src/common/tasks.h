@@ -5,6 +5,7 @@
 
 typedef char (*pt_fun_t)(struct pt *pt, int tid, void *arg);
 
+extern int ntasks;
 int init_tasks();
 int create_task(pt_fun_t fun, void *arg);
 int run_task(int tid);

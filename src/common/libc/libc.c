@@ -1,9 +1,9 @@
 #include <stdarg.h>
 
 #include "libc.h"
-#include "vid.h"        // dputchar
+#include "vid.h"        // dputchar, ...
 
-void *mmemset( void *_s, int c, size_t n) {
+void *mmemset(void *_s, int c, size_t n) {
     void *s = _s;
 
     if (s) {
@@ -13,6 +13,15 @@ void *mmemset( void *_s, int c, size_t n) {
     }
 
     return _s;
+}
+
+size_t mstrlen(const char *s) {
+    size_t result = 0;
+    if (s)
+    while (*s++) {
+        result++;
+    }
+    return result;
 }
 
 int mstrncmp(const char *s1, const char *s2, size_t n) {
@@ -25,7 +34,16 @@ int mstrncmp(const char *s1, const char *s2, size_t n) {
     return 0;
 }
 
-static char *dectostr( char *_s, int size, void *ptr) {
+void *mmemcpy(void *dest, const void *src, size_t n) {
+    char *dest_ = dest;
+    const char *src_ = src;
+    for (int i = 0; i < n; i++) {
+        *dest_++ = *src_++;
+    }
+    return dest;
+}
+
+static char *dectostr(char *_s, int size, void *ptr) {
     char *s = _s;
     int v = *(int *)ptr;
     if (v < 0) {
@@ -47,40 +65,36 @@ static char *dectostr( char *_s, int size, void *ptr) {
     return _s;
 }
 
-static char *hextostr( char *_s, void *ptr, int _len, int fixed) {
-	int len = _len;
-	char *s = _s + len * 2;
-	if (s && ptr)
-	{
-		*s-- = 0;
-		while (len)
-		{
-			char c = *(char *)ptr++;
-			char digit;
+static char *hextostr(char *_s, void *ptr, int _len, int fixed) {
+    int len = _len;
+    char *s = _s + len * 2;
+    if (s && ptr) {
+        *s-- = 0;
+        while (len) {
+            char c = *(char *)ptr++;
+            char digit;
 
-			digit = c & 0xf;
-			*s-- = digit >= 10 ? digit + 'A' - 10 : digit + '0';
-			digit = (c >> 4) & 0xf;
-			*s-- = digit >= 10 ? digit + 'A' - 10 : digit + '0';
-			len--;
-		}
-		
-		s = _s;
-		int skip = 0;
-		while (*s)
-		{
-			if (*s != '0')
-				break;
-			skip++;
-			s++;
-		}
-		s = _s;
-		if (skip == (_len * 2))
-			skip--;
-		if (skip && !fixed)
-		while (1)
-		{
-			*s = *(s + skip);
+            digit = c & 0xf;
+            *s-- = digit >= 10 ? digit + 'A' - 10 : digit + '0';
+            digit = (c >> 4) & 0xf;
+            *s-- = digit >= 10 ? digit + 'A' - 10 : digit + '0';
+            len--;
+        }
+
+        s = _s;
+        int skip = 0;
+        while (*s) {
+            if (*s != '0')
+                break;
+            skip++;
+            s++;
+        }
+        s = _s;
+        if (skip == (_len * 2))
+            skip--;
+        if (skip && !fixed)
+        while (1) {
+            *s = *(s + skip);
 			if (!*s)
 				break;
 			s++;
@@ -90,7 +104,69 @@ static char *hextostr( char *_s, void *ptr, int _len, int fixed) {
 	return _s;
 }
 
-int mprintf( const char *fmt, ...) {
+int mvsnprintf(char *str, size_t size, const char *fmt, va_list ap) {
+    char buf[20];
+    void *ptr;
+    int chr;
+    int num;
+    //int written = 0;
+
+    memset(buf, '?', sizeof( buf) - 1);
+    if (fmt)
+    while (*fmt) {
+        //int upper = 0;        //TODO
+        int size = -1;
+        int fixed = 0;
+        if (*fmt == '%') {
+            while (1) {
+                fmt++;
+                switch (*fmt) {
+                    case 'l':
+                        continue;
+                    case '0'...'9':
+                        size = *fmt - '0';
+                        fixed = 1;
+                        continue;
+                    case 'X':
+                        //upper = 1;    //TODO
+                    case 'p':
+                    case 'x':
+                        ptr = va_arg(ap, typeof( ptr));
+                        //dputs( "0x");
+                        if ((size < 0) || (size > sizeof(ptr)))
+                            size = sizeof(ptr);
+                        else {
+                            size /= 2;
+                        }
+                        hextostr(buf, &ptr, size, fixed);
+                        dputs(buf);
+                        break;
+                    case 'c':
+                        chr = va_arg(ap, typeof( chr));
+                        dputchar(chr);
+                        break;
+                    case 's':
+                        ptr = va_arg(ap, typeof( ptr));
+                        dputs(ptr);
+                        break;
+                    case 'd':
+                        num = va_arg(ap, typeof(num));
+                        dectostr(buf, sizeof(buf), &num);
+                        dputs(buf);
+                        break;
+                }
+                break;
+            }
+        }
+        else
+            dputchar(*fmt);
+        fmt++;
+    }
+
+    return 0;
+}
+
+int mprintf(const char *fmt, ...) {
 	char buf[20];
 	va_list ap;
 	void *ptr;
