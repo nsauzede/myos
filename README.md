@@ -33,6 +33,8 @@ You should then see the first instructions of the 16-bit loader:
 ```
 
 # Plan
+- [x] Add 16-bits support
+- [x] Add 32-bits support
 - [x] Add 64-bits support
 - [ ] Fix static variables initialization
 - [ ] Fix multiboot support (test in grub)
