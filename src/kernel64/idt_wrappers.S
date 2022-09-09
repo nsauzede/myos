@@ -43,8 +43,9 @@ iretq
 .irp id,8
 .p2align 2,0x90
 exc_wrapper_\id:
-1:
 movw $0x0c41,0xb8000
+1:
+hlt
 jmp 1b
 .endr
 
@@ -54,6 +55,7 @@ jmp 1b
 irq_wrapper_\id:
 movw $0x0c42,0xb8000
 1:
+hlt
 jmp 1b
 .endr
 
@@ -70,6 +72,7 @@ exc_wrapper_\id:
 // print double fault message before infinite loop
 movw $0x0c43,0xb8000
 1:
+hlt
 jmp 1b
 .endr
 #endif
@@ -106,6 +109,7 @@ pop %r8
 pop %r9
 call mprintf
 1:
+hlt
 jmp 1b
 .endr
 argh:

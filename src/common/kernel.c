@@ -7,6 +7,16 @@
 
 #include "tasks.h"
 
+#define BANNER_HEIGHT 8
+static char banner[] = R"(
+ __   __         ____    ____
+/  \_/  \       / __ \  / __ \
+| |   | | _  __| /  \ || \__\_|
+| |\_/| || \/ /| |  | | _\__  \
+| |   | | \  / | \__/ || \__| |
+\_|   |_/_/ /   \____/  \____/
+        |__/ MyOS 0.1 - Copyright (C) Nicolas Sauzede 2009-2022.
+)";
 static char version[] = "0.1";
 
 unsigned char stack[0x4000] asm("stack") = {
@@ -86,25 +96,44 @@ SC(K_NUMLK, -1),SC(K_SCRLK, -1),SC(K_KP7, '7'),SC(K_KP8, '8'),SC(K_KP9, '9'),SC(
 SC(0xfa, 'a'),SC(0xfb, 'b'),SC(K_BSLSH, '\\'),SC(K_F11, -1),SC(K_F12, -1),
 };
 
+#if 0
+static int stdout_tail = 0;
+static int stdout_head = 0;
+#define STDOUT_SIZE 40
+static char stdout_ring[STDOUT_SIZE];
+#endif
+
 static int stdin_tail = 0;
 static int stdin_head = 0;
 #define STDIN_SIZE 40
 static char stdin_ring[STDIN_SIZE];
+
 static int klen = 0;
 #define MAXK 20
 static uint8_t kcodes[MAXK];
 static uint8_t kflags[256];       // 1: pressed 0: released/non-pressed
 
 int tid_start(int tid) {
-    return 4 + 3 * tid;
+    return 2 + 3 * tid;
 }
 
-PT_THREAD(tshello(struct pt *pt, int tid, void *arg)) {
+typedef struct {
+    int done;
+} task_t;
+
+PT_THREAD(thello(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
+    task_t *t = (task_t *)arg;
     static int startl;
     startl = tid_start(tid);
-    gotoxy(0, startl + 0);
-    printf("%s: Hello World!\n", __func__);
+    gotoxy(0, startl * 0 + 0);
+    static int count = 0;
+    printf("%s: Hello!#%d\n", __func__, count);
+    PT_WAIT_UNTIL(pt, t->done);
+    gotoxy(0, startl * 0 + 1);
+    printf("%s: Bye cruel world!#%d\n", __func__, count);
+    count++;
+    delete_task(tid);
     PT_END(pt);
 }
 
@@ -113,39 +142,61 @@ typedef struct {
     void (*fn)();
 } cmd_t;
 
-void sh_help();
-void sh_version();
-void sh_color();
-void sh_hello();
-
-static const cmd_t cmds[] = {
-    { "help", sh_help, },
-    { "version", sh_version, },
-    { "color", sh_color, },
-    { "hello", sh_hello, },
-};
-
-void sh_help() {
-    printf("Commands:");
-    for (int i = 0; i < sizeof(cmds) / sizeof(cmds[0]); i++) {
-        printf(" %s", cmds[i].name);
-    }
-    printf("\n");
+void cmd_banner() {
+    gotoxy(0, MAX_ROW - BANNER_HEIGHT);
+    int old_attr = getattr();
+    setattr(BG_FG(BLACK, BROWN));
+    printf("%s", banner);
+    setattr(old_attr);
 }
 
-void sh_version() {
-    printf("MyOS %s\n", version);
+void cmd_cls() {
+    cls();
 }
 
-static const int colors[] = {GREEN, BROWN, WHITE, LRED};
-void sh_color() {
+static const int colors[] = {GREEN, WHITE, LRED, BROWN};
+void cmd_color() {
     static int color = 0;
     color = (color + 1) % (sizeof(colors) / sizeof(colors[0]));
     setattr(BG_FG(BLACK, colors[color]));
 }
 
-void sh_hello() {
-    create_task(tshello, 0);
+void cmd_hello() {
+    task_t t = {0};
+    t.done = 0;
+    int tid = create_task(thello, &t);
+    printf("tid %d was created, now deleting it\n", tid);
+    t.done = 1;
+}
+
+void cmd_help();
+
+static int no_halt = 0;         // do halt() in the scheduler
+void cmd_nohalt() {
+    no_halt = 1 - no_halt;
+    printf("no_halt=%d\n", no_halt);
+}
+
+void cmd_version() {
+    printf("MyOS %s\n", version);
+}
+
+static const cmd_t cmds[] = {
+    { "banner", cmd_banner, },
+    { "cls", cmd_cls, },
+    { "color", cmd_color, },
+    { "hello", cmd_hello, },
+    { "help", cmd_help, },
+    { "nohalt", cmd_nohalt, },
+    { "version", cmd_version, },
+};
+
+void cmd_help() {
+    printf("Commands:");
+    for (int i = 0; i < sizeof(cmds) / sizeof(cmds[0]); i++) {
+        printf(" %s", cmds[i].name);
+    }
+    printf("\n");
 }
 
 static void shell(char *s, int len) {
@@ -154,9 +205,24 @@ static void shell(char *s, int len) {
             return cmds[i].fn();
         }
     }
-    printf("%s: invalid shell command [%s]\n", __func__, s);
+    printf("%s: invalid command [%s]\n", __func__, s);
     printf("%s: try [help]\n", __func__);
 }
+
+/*
+PT_THREAD(tfgets(struct pt *pt, int tid, void *arg)) {
+    PT_BEGIN(pt);
+    printf("%s: tid=%d bye\n", __func__, tid);
+    PT_END(pt);
+}
+
+char *fgets(char *s, int size, FILE *stream) {
+    char *result = 0;
+    struct pt pt = {.state=STATE_BUSY};
+    tfgets(&pt, 123, 0);
+    return result;
+}
+*/
 
 PT_THREAD(tshell(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
@@ -166,8 +232,17 @@ PT_THREAD(tshell(struct pt *pt, int tid, void *arg)) {
     static int stdin_len;
     while (1) {
         gotoxy(0, startl + 0);
-        printf("%s: (stdin=%p len=%d tail=%d head=%d) [%s]\n", __func__, stdin, stdin_len, stdin_tail, stdin_head, stdin_ring);
+        printf("%s:0=%p l=%d t=%d h=%d [%s]\n", __func__, stdin, stdin_len, stdin_tail, stdin_head, stdin_ring);
+#ifdef STDOUT_SIZE
+        static char *stdout;
+        if (stdout_tail < stdout_head)
+            stdout = stdout_ring + stdout_tail;
+        else
+            stdout = stdout_ring + stdout_head;
+        printf("-----------[%p]--------------\n", stdout);
+#else
         printf("---------------------------\n");
+#endif
         printf("cmd> %s ", kcodes);
         setcursor(5 + strlen((char *)kcodes), startl + 2);
         static int klen_;
@@ -183,7 +258,6 @@ PT_THREAD(tshell(struct pt *pt, int tid, void *arg)) {
             stdin_len = stdin_tail - stdin_head;
         }
         gotoxy(0, startl + 3);
-        cls();
         shell(stdin, stdin_len);
         stdin_tail = stdin_head;
     }
@@ -194,7 +268,6 @@ PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
     static int startl = 0;
     startl = tid_start(tid);
-//    kb_init();
     while (1) {
         static int count = 0;
         static int ovf = 0;
@@ -261,15 +334,19 @@ PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
     PT_END(pt);
 }
 
-PT_THREAD(tsys(struct pt *pt, int tid, void *arg)) {
+PT_THREAD(tinit(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
     static int startl = 0;
     startl = tid_start(tid);
 
+    create_task(tkb, 0);        // mandatory task to process kb buffer
+    create_task(tshell, 0);
+    cmd_banner();
+
     while (1) {
         static int count = 0;
         gotoxy(0, startl + 0);
-        printf("%s: #%d jif=%d kb=%p ntsk=%d divs=%p \n", __func__, count++, jiffies, kbhits, ntasks, divs);
+        printf("%s: kernel%d #%d jif=%d kb=%p ntsk=%d divs=%p \n", __func__, sizeof(void *) * 8, count++, jiffies, kbhits, ntasks, divs);
         static int j;
         for (j = 0; j < KB_SIZE; j++) {
             printf("%c%02x%c", j == kb_head ? '>' : ' ', kb_ring[j], j == kb_head ? '<' : ' ');
@@ -281,9 +358,9 @@ PT_THREAD(tsys(struct pt *pt, int tid, void *arg)) {
 
 static void schedule() {
     while (1) {
-        gotoxy(0, 2);             // leave first lines for interrupts
-        printf("Hello kernel%d - Copyright (C) Nicolas Sauzede 2009-2022.\n", sizeof(void *) * 8);
-        halt();
+        if (!no_halt) {
+            halt();
+        }
         schedule_tasks();
     }
 }
@@ -302,13 +379,8 @@ void kernel_main() {
     irq_set_handler(IRQ_TIMER, timer_handler);
     i8254_set_freq(1);
 
-//    setcursor(5, 2);
-    enable();
-
     init_tasks();
-    create_task(tsys, 0);      // dummy task to show jiffies, keypresses etc..
-    create_task(tkb, 0);        // mandatory task to process kb buffer
-    create_task(tshell, 0);
-
+    create_task(tinit, 0);         // create the world, then monitor jiffies, keypresses, tasks, etc..
+    enable();
     schedule();                // schedule tasks forever..
 }

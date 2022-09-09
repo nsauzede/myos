@@ -41,6 +41,7 @@ void setcursor( int x, int y);
 void setmode03( void);
 void setmode13( void);
 void setattr( int _attr);
+int getattr();
 void console_init();
 void cls();
 int dputchar( int c);

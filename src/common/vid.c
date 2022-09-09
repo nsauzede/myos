@@ -11,6 +11,10 @@ void setattr(int _attr) {
     attr = _attr;
 }
 
+int getattr() {
+    return attr;
+}
+
 void home() {
     gotoxy(0, 0);
 }
@@ -23,11 +27,23 @@ void gotoxy(int x, int y) {
 void console_init() {
     attr = DEFAULT_ATTR;
     home();
-    cls();
+//    cls();
 }
 
 void cls() {
+#if 0
+    // problem: cells with 0x00 as attr do not display the cursor
+    // and using 0x20 instaead displays some green background
     memset((void *)0xb8000, 0, MAX_ROW * MAX_COL * 2);
+#else
+    // slow, but works, honoring the attr
+    unsigned short *mem = (void *)0xb8000;
+    for (int row = 0; row < MAX_ROW; row++) {
+        for (int col = 0; col < MAX_COL; col++) {
+            mem[MAX_COL * row + col] = (attr << 8) | 0x00;
+        }
+    }
+#endif
 }
 
 int dputchar(int c) {

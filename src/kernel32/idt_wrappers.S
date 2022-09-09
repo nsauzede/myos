@@ -173,7 +173,8 @@ push $0
 push $0
 call setcursor
 #endif
-1: hlt
+1:
+hlt
 jmp 1b
 .endr
 #endif
@@ -207,7 +208,8 @@ pop %eax
 push $0
 push $0
 call setcursor
-1: hlt
+1:
+hlt
 jmp 1b
 .endr
 

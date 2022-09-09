@@ -30,7 +30,7 @@ int schedule_tasks()
 		run_task( tid);
 		tid = (tid + 1) % MAX_TASK;
 	}
-	return 0;
+	return ntasks;
 }
 
 int create_task( pt_fun_t fun, void *arg)
@@ -51,8 +51,9 @@ int create_task( pt_fun_t fun, void *arg)
 	PT_INIT( &(tasks[i].pt));
 	tasks[i].fun = fun;
 	tasks[i].arg = arg;
+	ntasks++;
 
-	return ntasks++;
+	return i;
 }
 
 int run_task( int tid)
@@ -75,5 +76,5 @@ int delete_task( int tid)
 		}
 	}
 	
-	return 0;
+	return ntasks;
 }
