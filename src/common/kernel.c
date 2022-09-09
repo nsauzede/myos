@@ -243,7 +243,7 @@ PT_THREAD(tshell(struct pt *pt, int tid, void *arg)) {
 #else
         printf("---------------------------\n");
 #endif
-        printf("cmd> %s ", kcodes);
+        printf("cmd> %s", kcodes);
         setcursor(5 + strlen((char *)kcodes), startl + 2);
         static int klen_;
         PT_WAIT_UNTIL(pt, klen_ != klen || stdin_head != stdin_tail);

@@ -9,7 +9,14 @@ Required tools: qemu-system-i386, nasm, gcc and make (and optionally gdb for deb
 Note that "gcc-multilib" might also be needed to build 32-bit binaries.
 Note also that bcc is needed to build the C 16-bit kernel (experimental).
 
-Run the 16-bit kernel as a floppy boot sector:
+Run and debug the 64-bit kernel as a HDD boot sector:
+```
+$ make db64
+```
+You should see this after setting a breakpoint in the function `cmd_help`, finish its execution and enter the command `help`:
+![kernel64 screenshot](debug64/kernel64.png)
+
+Run the 16-bit kernel as a HDD boot sector:
 ```
 $ make check16
 ```
