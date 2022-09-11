@@ -3,7 +3,7 @@
 #endif
 #define KERNEL_SEG (KERNEL_ADDR >> 4)
 #define STACK_SIZE 0x4000
-//#define START_IN_REALM
+#define START_IN_REALM
 #ifdef START_IN_REALM
 #define IS32BIT 0
 #else
@@ -20,6 +20,7 @@ _kernel_start:
 #ifdef START_IN_REALM	// only if not done in loader
 .code16
 
+entry16:
 cli
 ljmp $KERNEL_SEG,$(_here-KERNEL_ADDR)		/* mandatory : reset offset */
 //ljmp $KERNEL_SEG,$_here		/* mandatory : reset offset */
@@ -46,6 +47,18 @@ ljmp $0x8,$((Here32))
 
 .code32
 
+#if 1
+_multiboot_entry:
+mov gdt,%ax
+lgdt gdt
+mov $0x10,%ax
+mov %ax,%ds
+mov %ax,%es
+mov %ax,%fs
+mov %ax,%gs
+ljmp $0x8,$Here32
+#endif
+
 _kernel_entry:
 Here32:
 mov $0xbeefdead,%eax
@@ -63,7 +76,7 @@ inf:
 	hlt
 	jmp inf
 
-#if 0
+#if 1
 .align 4
 #define MAGIC 0x1badb002
 #define FLAGS 0x00010003
@@ -72,10 +85,14 @@ magic: .long MAGIC
 flags: .long FLAGS
 chksm: .long -(MAGIC+FLAGS)
 hdrad: .long magic
+//hdrad: .long KERNEL_ADDR+magic
 ldadr: .long KERNEL_ADDR
-ldead: .long KERNEL_ADDR+_end
-bssea: .long 0x0
-entry: .long _kernel_entry
+//ldead: .long KERNEL_ADDR+_end
+ldead: .long KERNEL_ADDR+__bss_start
+//bssea: .long 0x0
+bssea: .long KERNEL_ADDR+_end
+//entry: .long _kernel_entry
+entry: .long _multiboot_entry
 #endif
 
 gdt:

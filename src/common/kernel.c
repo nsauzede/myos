@@ -8,7 +8,7 @@
 #include "tasks.h"
 
 #define BANNER_HEIGHT 8
-static char banner[] = R"(
+static const char banner[] = R"(
  __   __         ____    ____
 /  \_/  \       / __ \  / __ \
 | |   | | _  __| /  \ || \__\_|
@@ -17,7 +17,7 @@ static char banner[] = R"(
 \_|   |_/_/ /   \____/  \____/
         |__/ MyOS 0.1 - Copyright (C) Nicolas Sauzede 2009-2022.
 )";
-static char version[] = "0.1";
+static const char version[] = "0.1";
 
 unsigned char stack[0x4000] asm("stack") = {
     [0] = 0xde,
@@ -358,16 +358,22 @@ PT_THREAD(tinit(struct pt *pt, int tid, void *arg)) {
 
 static void schedule() {
     while (1) {
-        if (!no_halt) {
+//        if (!no_halt) {
             halt();
-        }
+//        }
         schedule_tasks();
     }
 }
 
 void kernel_main() asm("kernel_main");
 void kernel_main() {
+#if 1
+    // it seems like GRUB/multiboot doesn't zero out .bss ?
+    extern char __bss_start[0], _end[0];
+    memset(__bss_start, 0, _end - __bss_start); // zero out BSS
+#endif
     console_init();             // this will initialize internal console data for subsequent printouts
+    printf("Hello GRUB no_halt=%x\n", no_halt); // dumb print to check if no_halt (ie: .bss) has been zeroed out
 
     idt_setup();                // init idt with default int handlers
 
