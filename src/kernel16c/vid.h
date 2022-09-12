@@ -32,22 +32,22 @@ f white
 
 void home();
 /*
-void gotoxy( int x, int y);
-void setcursor( int x, int y);
-void setmode03( void);
-void setmode13( void);
-//void setattr( int _attr);
-//int dputchar( int c);
-//void dputs( const char *s);
+void gotoxy(int x, int y);
+void setcursor(int x, int y);
+void setmode03(void);
+void setmode13(void);
+//void setattr(int _attr);
+//int dputchar(int c);
+//void dputs(const char *s);
 */
-void gotoxy( x, y);
-void setcursor( x, y);
+void gotoxy(x, y);
+void setcursor(x, y);
 void setmode03();
 void setmode13();
-void setattr( _attr);
+void setattr(_attr);
 void console_init();
 void cls();
-int dputchar( c);
-void dputs( s);
+int dputchar(c);
+void dputs(s);
 
 #endif/*__VID_H__*/

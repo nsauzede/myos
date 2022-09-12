@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main( int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	char *name = NULL;
 	FILE *in;
@@ -17,38 +17,38 @@ int main( int argc, char *argv[])
 				mod = 1;
 		}
 	}
-	in = fopen( name, "rb");
+	in = fopen(name, "rb");
 	if (!in)
 	{
-		printf( "couldn't open '%s' !\n", name);
+		printf("couldn't open '%s' !\n", name);
 	}
 	else
 	{
 		long size, i;
 		unsigned char *buf;
 		
-		fseek( in, 0, SEEK_END);
-		size = ftell( in);
-		printf( "file size is %ld\n", size);
-		rewind( in);
-		buf = malloc( size);
+		fseek(in, 0, SEEK_END);
+		size = ftell(in);
+		printf("file size is %ld\n", size);
+		rewind(in);
+		buf = malloc(size);
 		if (buf)
 		{
 			int sum = 0;
 			char sizeread, sizecomp;
 
-			fread( buf, size, 1, in);
+			fread(buf, size, 1, in);
 			if ((buf[0] != 0x55) || (buf[1] != 0xAA))
 			{
-				printf( "file is not a ROM extension !\n");
-				exit( 42);
+				printf("file is not a ROM extension !\n");
+				exit(42);
 			}
 			sizeread = buf[2];
-			printf( "stored size=%d\n", sizeread);
+			printf("stored size=%d\n", sizeread);
 			sizecomp = size / 512;
 			if (size % 512)
 				sizecomp++;
-			printf( "computed size=%d : ", sizecomp);
+			printf("computed size=%d : ", sizecomp);
 			for (i = 0; i < size; i++)
 			{
 				unsigned char c;
@@ -56,47 +56,47 @@ int main( int argc, char *argv[])
 				c = buf[i];
 				sum += c;
 			}
-			printf( "computed sum=%04x : ", sum);
+			printf("computed sum=%04x : ", sum);
 			if (sum % 256)
 			{
 				unsigned char pad;
 
 //				pad = sum & 0xFF;
 				pad = -sum;
-				printf( "mismatch should be %04X\n", (unsigned short)pad);
+				printf("mismatch should be %04X\n", (unsigned short)pad);
 				if (mod)
 				{
-					fclose( in);
-					in = fopen( name, "rb+");
+					fclose(in);
+					in = fopen(name, "rb+");
 					buf[2] = sizecomp;
 //					buf[size - 2] = 0;
 //					buf[size - 1] = pad;
-					printf( "moded\n");
+					printf("moded\n");
 					fwrite(buf,size,1,in);
 					int padsize = sizecomp * 512 - size - 2;
 					if (padsize > 0)
 					{
-						char *buf2 = malloc( padsize);
+						char *buf2 = malloc(padsize);
 						
-						printf( "padding %d bytes\n", padsize);
-						memset( buf2, 0x00, padsize);
-						fwrite( buf2, padsize, 1, in);
-						free( buf2);
+						printf("padding %d bytes\n", padsize);
+						memset(buf2, 0x00, padsize);
+						fwrite(buf2, padsize, 1, in);
+						free(buf2);
 					}
 //					unsigned short w = pad;
-//					fwrite( &w, sizeof( w), 1, in);
+//					fwrite(&w, sizeof(w), 1, in);
 					unsigned char b = 0;
-					fwrite( &b, sizeof( b), 1, in);
-					fwrite( &pad, sizeof( pad), 1, in);
+					fwrite(&b, sizeof(b), 1, in);
+					fwrite(&pad, sizeof(pad), 1, in);
 				}
 			}
 			else
 			{
-				printf( "match\n");
+				printf("match\n");
 			}
-			free( buf);
+			free(buf);
 		}
-		fclose( in);
+		fclose(in);
 	}
 
 	return 0;

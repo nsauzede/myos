@@ -4,7 +4,7 @@
 #include "types.h"
 
 //#define memset mmemset
-//void *mmemset( /*void **/_s, /*void **/_o, /*int*/ c, /*size_t*/ n);
+//void *mmemset(/*void **/_s, /*void **/_o, /*int*/ c, /*size_t*/ n);
 
 void console_init();
 void cls();
@@ -15,12 +15,12 @@ void cls();
 #define BG_BLACK (BLACK << 4) 
 #define FG_RED (RED) 
 #define FG_GREEN (GREEN) 
-void setattr( /*int*/ attr);
+void setattr(/*int*/ attr);
 
 #define puts dputs
-void dputs( /*const char **/s);
+void dputs(/*const char **/s);
 
 #define printf mprintf
-int mprintf( /*const char **/fmt /*, ...*/);
+int mprintf(/*const char **/fmt /*, ...*/);
 
 #endif/*__LIBC_H__*/

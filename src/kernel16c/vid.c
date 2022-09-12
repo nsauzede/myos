@@ -5,28 +5,28 @@
 */
 
 
-#define IODELAY() asm ( "db 0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90")
+#define IODELAY() asm ("db 0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90")
 
 static int col = 0;
 static int row = 0;
 static unsigned char attr = 0;
 
 
-void setcursor( x, y)
+void setcursor(x, y)
 int x; int y;
 {
 	int loc;
 	unsigned char byte;
 
 	loc = y * 80 + x;
-/*	outb( 0xe, 0x3d4);*/
+/*	outb(0xe, 0x3d4);*/
 	IODELAY();
 	byte = (loc >> 8) & 0xFF;
-/*	outb( byte, 0x3d5);
-	outb( 0xf, 0x3d4);*/
+/*	outb(byte, 0x3d5);
+	outb(0xf, 0x3d4);*/
 	IODELAY();
 	byte = loc & 0xFF;
-/*	outb( byte, 0x3d5);*/
+/*	outb(byte, 0x3d5);*/
 }
 
 void setmode03()
@@ -42,19 +42,19 @@ void setmode13()
 /*
 	void _setmode13();
 	_setmode13();
-	memset( (void *)0xa000, 0,0,320*200);
+	memset((void *)0xa000, 0,0,320*200);
 */
 }
 /*
-//void setattr( int _attr)
-//void gotoxy( int x, int y)
-//int dputchar( int c)
-//void dputs( const char *s)
-//void setcursor( int x, int y)
-//void setmode03( void)
-//void setmode13( void)
+//void setattr(int _attr)
+//void gotoxy(int x, int y)
+//int dputchar(int c)
+//void dputs(const char *s)
+//void setcursor(int x, int y)
+//void setmode03(void)
+//void setmode13(void)
 */
-void setattr( _attr)
+void setattr(_attr)
 int _attr;
 {
     attr = _attr;
@@ -62,10 +62,10 @@ int _attr;
 
 void home()
 {
-	gotoxy( 0, 0);
+	gotoxy(0, 0);
 }
 
-void gotoxy( x, y)
+void gotoxy(x, y)
 int x; int y;
 {
     col = x;
@@ -82,11 +82,11 @@ void console_init()
 void cls()
 {
 /*
-	memset( (void *)0xb800, 0, attr, MAX_ROW * MAX_COL * 2);
+	memset((void *)0xb800, 0, attr, MAX_ROW * MAX_COL * 2);
 */
 }
 
-int dputchar( c)
+int dputchar(c)
 int c;
 {
 	unsigned char *ptr = (void *)0xB800;
@@ -114,7 +114,7 @@ int c;
 	return 0;
 }
 
-void dputs( s)
+void dputs(s)
 char *s;
 {
     unsigned char *ptr = (void *)0xB800;

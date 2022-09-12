@@ -17,7 +17,7 @@ int tid = 0;
 
 int init_tasks()
 {
-	memset( tasks, 0, sizeof( tasks));
+	memset(tasks, 0, sizeof(tasks));
 	return 0;
 }
 
@@ -27,13 +27,13 @@ int schedule_tasks()
 	{
 		while (!(tasks[tid].state & STATE_BUSY))
 			tid = (tid + 1) % MAX_TASK;
-		run_task( tid);
+		run_task(tid);
 		tid = (tid + 1) % MAX_TASK;
 	}
 	return ntasks;
 }
 
-int create_task( pt_fun_t fun, void *arg)
+int create_task(pt_fun_t fun, void *arg)
 {
 	if (ntasks >= MAX_TASK)
 	{
@@ -48,7 +48,7 @@ int create_task( pt_fun_t fun, void *arg)
 	if (i >= MAX_TASK)
 		return -1;
 	tasks[i].state = STATE_BUSY;
-	PT_INIT( &(tasks[i].pt));
+	PT_INIT(&(tasks[i].pt));
 	tasks[i].fun = fun;
 	tasks[i].arg = arg;
 	ntasks++;
@@ -56,14 +56,14 @@ int create_task( pt_fun_t fun, void *arg)
 	return i;
 }
 
-int run_task( int tid)
+int run_task(int tid)
 {
-	tasks[tid].fun( &(tasks[tid].pt), tid, tasks[tid].arg);
+	tasks[tid].fun(&(tasks[tid].pt), tid, tasks[tid].arg);
 
 	return 0;
 }
 
-int delete_task( int tid)
+int delete_task(int tid)
 {
 	if ((tid >= 0) && (tid < MAX_TASK))
 	{

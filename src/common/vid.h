@@ -36,15 +36,15 @@ f white
 #define DEFAULT_ATTR    BG_FG(DEFAULT_BG, DEFAULT_FG)
 
 void home();
-void gotoxy( int x, int y);
-void setcursor( int x, int y);
-void setmode03( void);
-void setmode13( void);
-void setattr( int _attr);
+void gotoxy(int x, int y);
+void setcursor(int x, int y);
+void setmode03(void);
+void setmode13(void);
+void setattr(int _attr);
 int getattr();
 void console_init();
 void cls();
-int dputchar( int c);
-void dputs( const char *s);
+int dputchar(int c);
+void dputs(const char *s);
 
 #endif/*__VID_H__*/

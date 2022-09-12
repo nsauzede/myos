@@ -39,7 +39,7 @@ void panic(const char *fmt, ...) {
     }
 }
 
-static void int_handler( int id, uint32_t _ebp,
+static void int_handler(int id, uint32_t _ebp,
     uint32_t gs, uint32_t fs, uint32_t es, uint32_t ds, uint32_t ss,
     uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx, uint32_t esi, uint32_t edi, uint32_t ebp,
     uint32_t code, uint32_t eip, uint32_t cs, uint32_t eflags)
@@ -65,7 +65,7 @@ static void timer_handler(int id, uint32_t ebp) {
 static unsigned char kb_ring[KB_SIZE];
 static int kb_head = 0;
 static int kb_tail = 0;
-static void kb_handler( int id, uint32_t ebp) {
+static void kb_handler(int id, uint32_t ebp) {
     unsigned char byte;
     byte = inb(KB_PORT);
     kb_ring[kb_head % KB_SIZE] = byte;

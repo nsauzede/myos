@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main( int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	char *name = NULL, *name2 = NULL;
 	FILE *in;
@@ -17,11 +17,11 @@ int main( int argc, char *argv[])
 	}
 	if (!name2 || !name)
 	{
-		printf( "usage: mkrom in out\n");
-		exit( 1);
+		printf("usage: mkrom in out\n");
+		exit(1);
 	}
-	printf( "input is [%s] output is [%s]\n", name, name2);
-	in = fopen( name, "rb+");
+	printf("input is [%s] output is [%s]\n", name, name2);
+	in = fopen(name, "rb+");
 	if (in)
 	{
 		long size, i;
@@ -29,29 +29,29 @@ int main( int argc, char *argv[])
 		int len;
 		unsigned char sizeread, sizecomp;
 		
-		fseek( in, 0, SEEK_END);
-		size = ftell( in);
-		rewind( in);
+		fseek(in, 0, SEEK_END);
+		size = ftell(in);
+		rewind(in);
 		len = (size + 5) / 512 + 1;
 //		if (!len)
 //			len++;
-		printf( "file size=%ld => len=%d\n", size, len);
+		printf("file size=%ld => len=%d\n", size, len);
 //		size = len * 512 - 5;
-		buf = malloc( size);
+		buf = malloc(size);
 		if (buf)
 		{
 			int sum = 0x00;
 
-			fread( buf, size, 1, in);
+			fread(buf, size, 1, in);
 			if ((buf[0] != 0x55) || (buf[1] != 0xAA))
 			{
-				printf( "file is not a ROM extension !\n");
-				exit( 42);
+				printf("file is not a ROM extension !\n");
+				exit(42);
 			}
 			sizeread = buf[2];
-			printf( "stored size=%d\n", sizeread);
+			printf("stored size=%d\n", sizeread);
 			sizecomp = (size / 512) + 1;
-			printf( "computed size=%d\n", sizecomp);
+			printf("computed size=%d\n", sizecomp);
 			buf[2] = sizecomp;
 			for (i = 0; i < size; i++)
 			{
@@ -60,41 +60,41 @@ int main( int argc, char *argv[])
 				c = buf[i];
 				sum += c;
 			}
-			printf( "computed sum=%04x : ", sum);
+			printf("computed sum=%04x : ", sum);
 			unsigned char pad = 0;
 			if (sum % 256)
 			{
 				pad = -sum;
-				printf( "mismatch should be %04X\n", (unsigned short)pad);
+				printf("mismatch should be %04X\n", (unsigned short)pad);
 			}
 			else
 			{
-				printf( "match\n");
+				printf("match\n");
 			}
 
-			FILE *out = fopen( name2, "wb");
+			FILE *out = fopen(name2, "wb");
 			if (out)
 			{
 				unsigned short w;
-				fwrite( buf, size, 1, out);
+				fwrite(buf, size, 1, out);
 				int padsize = sizecomp * 512 - size - 2;
 				if (padsize > 0)
 				{
-					char *buf2 = malloc( padsize);
+					char *buf2 = malloc(padsize);
 
-					printf( "padding %d bytes\n", padsize);
-					memset( buf2, 0x00, padsize);
-					fwrite( buf2, padsize, 1, out);
-					free( buf2);
+					printf("padding %d bytes\n", padsize);
+					memset(buf2, 0x00, padsize);
+					fwrite(buf2, padsize, 1, out);
+					free(buf2);
 				}
 				w = pad;
-				fwrite( &w, sizeof( w), 1, out);
-				fclose( out);
+				fwrite(&w, sizeof(w), 1, out);
+				fclose(out);
 			}
 
-			free( buf);
+			free(buf);
 		}
-		fclose( in);
+		fclose(in);
 	}
 
 	return 0;

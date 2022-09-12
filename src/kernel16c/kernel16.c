@@ -83,7 +83,7 @@ void kernel_main()
     printf(PTR("\n\n"));
     printf(PTR("hello kernel16 - kernel_main=[%p]\n"), kernel_main);
     while (1) {
-        asm ( "hlt");
+        asm ("hlt");
     }
 }
 

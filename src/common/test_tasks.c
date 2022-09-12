@@ -2,12 +2,12 @@
 
 #include "tasks.h"
 
-int dputchar( int c) {
+int dputchar(int c) {
     printf("%c", c);
     return 1;
 }
 
-void dputs( const char *s) {
+void dputs(const char *s) {
     printf("%s", s);
 }
 

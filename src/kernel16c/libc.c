@@ -4,7 +4,7 @@
 
 #include "vid.h"
 
-void *mmemset( _s, _o, c, n)
+void *mmemset(_s, _o, c, n)
 void *_s; void *_o; int c; size_t n;
 {
 	void *s = _s;
@@ -20,8 +20,8 @@ void *_s; void *_o; int c; size_t n;
 	return _s;
 }
 
-//static char *hextostr( char *_s, void *ptr, int _len, int fixed)
-static char *hextostr( _s, ptr, _len, fixed)
+//static char *hextostr(char *_s, void *ptr, int _len, int fixed)
+static char *hextostr(_s, ptr, _len, fixed)
 char *_s; void *ptr; int _len; int fixed;
 {
 	int len = _len;
@@ -66,8 +66,8 @@ char *_s; void *ptr; int _len; int fixed;
 	return _s;
 }
 
-//int mprintf( const char *fmt, ...)
-int mprintf( fmt, va_alist)
+//int mprintf(const char *fmt, ...)
+int mprintf(fmt, va_alist)
 /*const ??*/ char *fmt;
 va_dcl
 {
@@ -76,8 +76,8 @@ va_dcl
 	void *ptr;
 	int chr;
 	
-	memset( buf, '?', sizeof( buf) - 1);
-	va_start( ap);
+	memset(buf, '?', sizeof(buf) - 1);
+	va_start(ap);
 	if (fmt)
 	while (*fmt)
 	{
@@ -103,34 +103,34 @@ case'0':case'1':case'2':case'3':case'4':case'5':case'6':case'7':case'8':case'9':
 						upper = 1;
 					case 'p':
 					case 'x':
-//						ptr = va_arg( ap, typeof( ptr));
-						ptr = va_arg( ap, void *);
-//						dputs( "0x");
-						if ((size < 0) || (size > (sizeof( ptr))))
-							size = sizeof( ptr);
+//						ptr = va_arg(ap, typeof(ptr));
+						ptr = va_arg(ap, void *);
+//						dputs("0x");
+						if ((size < 0) || (size > (sizeof(ptr))))
+							size = sizeof(ptr);
 						else
 						{
 							size /= 2;
 						}
-						hextostr( buf, &ptr, size, fixed);
-						dputs( buf);
+						hextostr(buf, &ptr, size, fixed);
+						dputs(buf);
 						break;
 					case 'c':
-//						chr = va_arg( ap, typeof( chr));
-						chr = va_arg( ap, int);
-						dputchar( chr);
+//						chr = va_arg(ap, typeof(chr));
+						chr = va_arg(ap, int);
+						dputchar(chr);
 						break;
 					case 's':
-//						ptr = va_arg( ap, typeof( ptr));
-						ptr = va_arg( ap, void *);
-						dputs( ptr);
+//						ptr = va_arg(ap, typeof(ptr));
+						ptr = va_arg(ap, void *);
+						dputs(ptr);
 						break;
 #if 0
 					case 'd':
-//						ptr = va_arg( ap, typeof( ptr));
-						ptr = va_arg( ap, void *);
-						dectostr( buf, &ptr, sizeof( ptr));
-						dputs( buf);
+//						ptr = va_arg(ap, typeof(ptr));
+						ptr = va_arg(ap, void *);
+						dectostr(buf, &ptr, sizeof(ptr));
+						dputs(buf);
 						break;
 #endif
 				}
@@ -138,10 +138,10 @@ case'0':case'1':case'2':case'3':case'4':case'5':case'6':case'7':case'8':case'9':
 			}
 		}
 		else
-			dputchar( *fmt);
+			dputchar(*fmt);
 		fmt++;
 	}
-	va_end( ap);
+	va_end(ap);
 
 	return 0;
 }

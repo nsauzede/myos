@@ -1,6 +1,6 @@
 #include "ioport.h"
 
-void outb( val, port)
+void outb(val, port)
 uint8_t val; uint16_t port;
 {
 #asm
@@ -17,7 +17,7 @@ uint8_t val; uint16_t port;
 #endasm
 }
 
-uint8_t inb( port)
+uint8_t inb(port)
 uint16_t port;
 {
 #asm

@@ -111,7 +111,7 @@ int mvsnprintf(char *str, size_t size, const char *fmt, va_list ap) {
     int num;
     //int written = 0;
 
-    memset(buf, '?', sizeof( buf) - 1);
+    memset(buf, '?', sizeof(buf) - 1);
     if (fmt)
     while (*fmt) {
         //int upper = 0;        //TODO
@@ -131,8 +131,8 @@ int mvsnprintf(char *str, size_t size, const char *fmt, va_list ap) {
                         //upper = 1;    //TODO
                     case 'p':
                     case 'x':
-                        ptr = va_arg(ap, typeof( ptr));
-                        //dputs( "0x");
+                        ptr = va_arg(ap, typeof(ptr));
+                        //dputs("0x");
                         if ((size < 0) || (size > sizeof(ptr)))
                             size = sizeof(ptr);
                         else {
@@ -142,11 +142,11 @@ int mvsnprintf(char *str, size_t size, const char *fmt, va_list ap) {
                         dputs(buf);
                         break;
                     case 'c':
-                        chr = va_arg(ap, typeof( chr));
+                        chr = va_arg(ap, typeof(chr));
                         dputchar(chr);
                         break;
                     case 's':
-                        ptr = va_arg(ap, typeof( ptr));
+                        ptr = va_arg(ap, typeof(ptr));
                         dputs(ptr);
                         break;
                     case 'd':
@@ -173,8 +173,8 @@ int mprintf(const char *fmt, ...) {
 	int chr;
 	int num;
 	
-	memset( buf, '?', sizeof( buf) - 1);
-	va_start( ap, fmt);
+	memset(buf, '?', sizeof(buf) - 1);
+	va_start(ap, fmt);
 	if (fmt)
 	while (*fmt)
 	{
@@ -199,39 +199,39 @@ int mprintf(const char *fmt, ...) {
 //						upper = 1;	//TODO
 					case 'p':
 					case 'x':
-						ptr = va_arg( ap, typeof( ptr));
-//						dputs( "0x");
-						if ((size < 0) || (size > (sizeof( ptr))))
-							size = sizeof( ptr);
+						ptr = va_arg(ap, typeof(ptr));
+//						dputs("0x");
+						if ((size < 0) || (size > (sizeof(ptr))))
+							size = sizeof(ptr);
 						else
 						{
 							size /= 2;
 						}
-						hextostr( buf, &ptr, size, fixed);
-						dputs( buf);
+						hextostr(buf, &ptr, size, fixed);
+						dputs(buf);
 						break;
 					case 'c':
-						chr = va_arg( ap, typeof( chr));
-						dputchar( chr);
+						chr = va_arg(ap, typeof(chr));
+						dputchar(chr);
 						break;
 					case 's':
-						ptr = va_arg( ap, typeof( ptr));
-						dputs( ptr);
+						ptr = va_arg(ap, typeof(ptr));
+						dputs(ptr);
 						break;
 					case 'd':
-						num = va_arg( ap, typeof(num));
-						dectostr( buf, sizeof(buf), &num);
-						dputs( buf);
+						num = va_arg(ap, typeof(num));
+						dectostr(buf, sizeof(buf), &num);
+						dputs(buf);
 						break;
 				}
 				break;
 			}
 		}
 		else
-			dputchar( *fmt);
+			dputchar(*fmt);
 		fmt++;
 	}
-	va_end( ap);
+	va_end(ap);
 
 	return 0;
 }
