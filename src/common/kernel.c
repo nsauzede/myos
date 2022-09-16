@@ -1,5 +1,6 @@
 #include "libc.h"
 #include "vid.h"
+#include "myos.h"
 
 #include "ioport.h"
 #include "idt.h"
@@ -8,6 +9,7 @@
 #include "tasks.h"
 
 #define BANNER_HEIGHT 8
+static const char version[] = MYOS_VERSION;
 static const char banner[] = R"(
  __   __         ____    ____
 /  \_/  \       / __ \  / __ \
@@ -15,9 +17,8 @@ static const char banner[] = R"(
 | |\_/| || \/ /| |  | | _\__  \
 | |   | | \  / | \__/ || \__| |
 \_|   |_/_/ /   \____/  \____/
-        |__/ MyOS 0.1 - Copyright (C) Nicolas Sauzede 2009-2022.
+        |__/ MyOS )" MYOS_VERSION R"( - Copyright (C) Nicolas Sauzede 2009-2022.
 )";
-static const char version[] = "0.1";
 
 unsigned char stack[0x4000] asm("stack") = {
     [0] = 0xde,
@@ -373,7 +374,7 @@ void kernel_main() {
     memset(__bss_start, 0, _end - __bss_start); // zero out BSS
 #endif
     console_init();             // this will initialize internal console data for subsequent printouts
-    printf("Hello GRUB no_halt=%x\n", no_halt); // dumb print to check if no_halt (ie: .bss) has been zeroed out
+    //printf("Hello GRUB no_halt=%x\n", no_halt); // dumb print to check if no_halt (ie: .bss) has been zeroed out
 
     idt_setup();                // init idt with default int handlers
 
