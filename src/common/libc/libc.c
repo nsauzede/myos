@@ -95,13 +95,12 @@ static char *hextostr(char *_s, void *ptr, int _len, int fixed) {
         if (skip && !fixed)
         while (1) {
             *s = *(s + skip);
-			if (!*s)
-				break;
-			s++;
-		}
-	}
-	
-	return _s;
+            if (!*s)
+                break;
+            s++;
+        }
+    }
+    return _s;
 }
 
 int mvsnprintf(char *str, size_t size, const char *fmt, va_list ap) {
@@ -167,71 +166,66 @@ int mvsnprintf(char *str, size_t size, const char *fmt, va_list ap) {
 }
 
 int mprintf(const char *fmt, ...) {
-	char buf[20];
-	va_list ap;
-	void *ptr;
-	int chr;
-	int num;
-	
-	memset(buf, '?', sizeof(buf) - 1);
-	va_start(ap, fmt);
-	if (fmt)
-	while (*fmt)
-	{
-//		int upper = 0;	//TODO
-		int size = -1;
-		int fixed = 0;
-		if (*fmt == '%')
-		{
-			while (1)
-			{
-				fmt++;
-				switch (*fmt)
-				{
-					case 'l':
-						continue;
-					case '0'...'9':
-						size = *fmt - '0';
-						fixed = 1;
-						continue;
-						break;
-					case 'X':
-//						upper = 1;	//TODO
-					case 'p':
-					case 'x':
-						ptr = va_arg(ap, typeof(ptr));
-//						dputs("0x");
-						if ((size < 0) || (size > (sizeof(ptr))))
-							size = sizeof(ptr);
-						else
-						{
-							size /= 2;
-						}
-						hextostr(buf, &ptr, size, fixed);
-						dputs(buf);
-						break;
-					case 'c':
-						chr = va_arg(ap, typeof(chr));
-						dputchar(chr);
-						break;
-					case 's':
-						ptr = va_arg(ap, typeof(ptr));
-						dputs(ptr);
-						break;
-					case 'd':
-						num = va_arg(ap, typeof(num));
-						dectostr(buf, sizeof(buf), &num);
-						dputs(buf);
-						break;
-				}
-				break;
-			}
-		}
-		else
-			dputchar(*fmt);
-		fmt++;
-	}
-	va_end(ap);
+    char buf[20];
+    va_list ap;
+    void *ptr;
+    int chr;
+    int num;
 
-	return 0;
+    memset(buf, '?', sizeof(buf) - 1);
+    va_start(ap, fmt);
+    if (fmt)
+    while (*fmt)
+    {
+        //int upper = 0;	//TODO
+        int size = -1;
+        int fixed = 0;
+        if (*fmt == '%') {
+            while (1) {
+                fmt++;
+                switch (*fmt) {
+                    case 'l':
+                        continue;
+                    case '0'...'9':
+                        size = *fmt - '0';
+                        fixed = 1;
+                        continue;
+                    case 'X':
+                        //upper = 1;	//TODO
+                    case 'p':
+                    case 'x':
+                        ptr = va_arg(ap, typeof(ptr));
+                        //dputs("0x");
+                        if ((size < 0) || (size > (sizeof(ptr))))
+                            size = sizeof(ptr);
+                        else {
+                            size /= 2;
+                        }
+                        hextostr(buf, &ptr, size, fixed);
+                        dputs(buf);
+                        break;
+                    case 'c':
+                        chr = va_arg(ap, typeof(chr));
+                        dputchar(chr);
+                        break;
+                    case 's':
+                        ptr = va_arg(ap, typeof(ptr));
+                        dputs(ptr);
+                        break;
+                    case 'd':
+                        num = va_arg(ap, typeof(num));
+                        dectostr(buf, sizeof(buf), &num);
+                        dputs(buf);
+                        break;
+                }
+                break;
+            }
+        }
+        else
+            dputchar(*fmt);
+        fmt++;
+    }
+    va_end(ap);
+
+    return 0;
 }
