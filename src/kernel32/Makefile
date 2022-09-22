@@ -19,6 +19,7 @@ KLDFLAGS=-nostdlib -nostartfiles
 KLDFLAGS+=-Ttext=$(KERNEL_TEXT)
 
 KCFLAGS=-DKERNEL_ADDR=$(KERNEL_TEXT) -I . -I libc -I pt
+KCFLAGS+=$(shell $(COMMON)/myos_tag.sh)
 
 all:	$(TARGET)
 
