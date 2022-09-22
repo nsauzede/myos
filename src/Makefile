@@ -70,6 +70,7 @@ clean:
 	$(RM) $(TARGET) *.img *.sec *.bin *.rom
 	$(MAKE) -C tools $@
 	$(MAKE) -C loader $@
+	$(MAKE) -C common $@
 	$(MAKE) -C kernel16 $@
 	$(MAKE) -C kernel16c $@
 	$(MAKE) -C kernel32 $@
@@ -79,6 +80,7 @@ clobber: clean
 	$(RM) *~
 	$(MAKE) -C tools $@
 	$(MAKE) -C loader $@
+	$(MAKE) -C common $@
 	$(MAKE) -C kernel16 $@
 	$(MAKE) -C kernel16c $@
 	$(MAKE) -C kernel32 $@
