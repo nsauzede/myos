@@ -16,8 +16,8 @@ static const char banner[] = R"(
 | |   | | _  __| /  \ || \__\_|
 | |\_/| || \/ /| |  | | _\__  \
 | |   | | \  / | \__/ || \__| |
-\_|   |_/_/ /   \____/  \____/
-        |__/ MyOS )" MYOS_VERSION R"( - Copyright (C) Nicolas Sauzede 2009-2022.
+\_|   |_/_/ /   \____/  \____/ MyOS )" MYOS_VERSION R"(
+        |__/           Copyright (C) 2009-2022, Nicolas Sauzede.
 )";
 
 unsigned char stack[0x4000] asm("stack") = {
