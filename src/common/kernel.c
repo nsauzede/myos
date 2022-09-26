@@ -129,7 +129,7 @@ PT_THREAD(thello(struct pt *pt, int tid, void *arg)) {
     startl = tid_start(tid);
     gotoxy(0, startl * 0 + 0);
     static int count = 0;
-    printf("%s: Hello!#%d\n", __func__, count);
+    printf("%s: Hello! my tid=%d  #%d\n", __func__, tid, count);
     PT_WAIT_UNTIL(pt, t->done);
     gotoxy(0, startl * 0 + 1);
     printf("%s: Bye cruel world!#%d\n", __func__, count);
