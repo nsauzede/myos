@@ -50,10 +50,9 @@ You should then see the first instructions of the 16-bit loader:
 
 # About the project
 
-Some parts inspired on SOS : (another educational operating system)
-http://sos.enix.org/
+Some parts inspired by [SOS](http://sos.enix.org/) (another educational operating system)
 
-Uses protothread from Contiki-NG OS project (see LICENSE_pt.md BSD-3-Clause license).
+Uses protothread from [Contiki-NG](https://github.com/contiki-ng/contiki-ng) OS project (see LICENSE_pt.md BSD-3-Clause license).
 
 This project was started in 2009 to learn by myself how operating systems are
 written and work at their lowest level, and is only sporadically updated.
@@ -79,6 +78,4 @@ with few small gas/nasm assembly code.
 See doc/specs.txt for more technical details / general low level OS infos.
 
 The code should normally be quite portable and build under both windows and linux, thanks to
-some trickery concerning some asm symbol names, as inspired by this post :
-http://stackoverflow.com/questions/1034852/adding-leading-underscores-to-assembly-symbols-with-gcc-on-win32
-
+some trickery concerning some asm symbol names, as inspired by [this post](http://stackoverflow.com/questions/1034852/adding-leading-underscores-to-assembly-symbols-with-gcc-on-win32)
