@@ -58,10 +58,6 @@ static int jiffies = 0;
 static int kbhits = 0;
 static int divs = 0;
 
-static void timer_handler(int id, uint32_t ebp) {
-    jiffies++;
-}
-
 #define KB_SIZE 20
 static unsigned char kb_ring[KB_SIZE];
 static int kb_head = 0;
@@ -335,6 +331,11 @@ PT_THREAD(tkb(struct pt *pt, int tid, void *arg)) {
     PT_END(pt);
 }
 
+static void timer_handler(int id, uint32_t ebp) {
+    jiffies++;
+}
+
+static int nscheds = 0;
 PT_THREAD(tinit(struct pt *pt, int tid, void *arg)) {
     PT_BEGIN(pt);
     static int startl = 0;
@@ -347,22 +348,27 @@ PT_THREAD(tinit(struct pt *pt, int tid, void *arg)) {
     while (1) {
         static int count = 0;
         gotoxy(0, startl + 0);
-        printf("%s: kernel%d #%d jif=%d kb=%p ntsk=%d divs=%p \n", __func__, sizeof(void *) * 8, count++, jiffies, kbhits, ntasks, divs);
+        printf("%s: kernel%d #%d jif=%d kb=%p ntsk=%d nsch=%d divs=%p \n", __func__, sizeof(void *) * 8, count++, jiffies, kbhits, ntasks, nscheds, divs);
         static int j;
         for (j = 0; j < KB_SIZE; j++) {
             printf("%c%02x%c", j == kb_head ? '>' : ' ', kb_ring[j], j == kb_head ? '<' : ' ');
         }
         PT_YIELD(pt);
+        halt();
     }
     PT_END(pt);
 }
 
 static void schedule() {
     while (1) {
+        static int count = 0;
+        gotoxy(0, 2);
+        printf("%s: kernel%d #%d jif=%d kb=%p ntsk=%d nsch=%d divs=%p \n", __func__, sizeof(void *) * 8, count++, jiffies, kbhits, ntasks, nscheds, divs);
 //        if (!no_halt) {
             halt();
 //        }
         schedule_tasks();
+        nscheds++;
     }
 }
 
